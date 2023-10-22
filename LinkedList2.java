@@ -135,7 +135,7 @@ public class LinkedList2 {
 				node.next = _nodeToInsert;
 
 				if(_nodeToInsert.next == null)
-					tail = _nodeToInsert.next;
+					tail = _nodeToInsert;
 				return;
 			}
 			node = node.next;
