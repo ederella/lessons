@@ -1,3 +1,4 @@
+package linkedList;
 
 import java.util.*;
 
@@ -60,7 +61,6 @@ public class LinkedList {
 			}
 		}
 		return false;
-
 	}
 
 	public void removeAll(int _value) {
@@ -109,6 +109,8 @@ public class LinkedList {
 			Node newNext = this.head;
 			this.head = _nodeToInsert;
 			this.head.next = newNext;
+			if(this.head.next == null)
+				tail = this.head;
 			return;
 		}
 
