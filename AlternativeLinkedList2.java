@@ -51,9 +51,7 @@ public class AlternativeLinkedList2 {
 
 		while (node != tail) {
 			if (node.value == _value) {
-
 				node.prev.next = node.next;
-
 				node.next.prev = node.prev;
 
 				return true;
@@ -65,12 +63,11 @@ public class AlternativeLinkedList2 {
 	}
 
 	public void removeAll(int _value) {
-		Node node = this.head;
+		Node node = this.head.next;
 		
-		while (node != null) {
+		while (node != tail) {
 			if (node.value == _value) {
 				node.prev.next = node.next;
-
 				node.next.prev = node.prev;
 			}
 			node = node.next;
