@@ -56,8 +56,8 @@ public class DynArray<T> {
 			array[i] = array[i + 1];
 		}
 		array[count - 1] = null;
-		decreaseArray();
 		count--;
+		decreaseArray();
 	}
 	
 	private void checkIndex(int index, int start, int finish) {
@@ -82,16 +82,16 @@ public class DynArray<T> {
 			return;
 		
 		int newCapacity = (int)(capacity /DEREASE_CAPACITY_COEF);	
-				
-		if (newCapacity < MINIMAL_CAPACITY)
-			return;
+
+		capacity = newCapacity < MINIMAL_CAPACITY ? MINIMAL_CAPACITY: newCapacity;		
 		
-		capacity = newCapacity;		
+		if(capacity == array.length) 
+			return;
 		T[] newArray = (T[]) Array.newInstance(this.clazz, capacity);
 		for (int i = 0; i < newArray.length; i++) {
 			newArray[i] = array[i];
 		}
-		array = newArray;	
+		array = newArray;		
 	}
 }
 
