@@ -8,11 +8,8 @@ public class AlternativeLinkedList2 {
 	
 
 	public AlternativeLinkedList2() {
-		head = new Node(0);
-		head.setDummy();
-		
-		tail = new Node(0);
-		tail.setDummy();
+		head = new DummyNode();		
+		tail = new DummyNode();
 		
 		head.next = tail;
 		tail.prev = head;
@@ -27,7 +24,7 @@ public class AlternativeLinkedList2 {
 
 	public Node find(int _value) {
 		Node node = this.head.next;
-		while (node != tail) {
+		while (node.getClass() != DummyNode.class) {
 			if (node.value == _value)
 				return node;
 			node = node.next;
@@ -38,7 +35,7 @@ public class AlternativeLinkedList2 {
 	public ArrayList<Node> findAll(int _value) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		Node node = this.head.next;
-		while (node != tail) {
+		while (node.getClass() != DummyNode.class) {
 			if (node.value == _value)
 				nodes.add(node);
 			node = node.next;
@@ -49,7 +46,7 @@ public class AlternativeLinkedList2 {
 	public boolean remove(int _value) {
 		Node node = this.head.next;
 
-		while (node != tail) {
+		while (node.getClass() != DummyNode.class) {
 			if (node.value == _value) {
 				node.prev.next = node.next;
 				node.next.prev = node.prev;
@@ -65,7 +62,7 @@ public class AlternativeLinkedList2 {
 	public void removeAll(int _value) {
 		Node node = this.head.next;
 		
-		while (node != tail) {
+		while (node.getClass() != DummyNode.class) {
 			if (node.value == _value) {
 				node.prev.next = node.next;
 				node.next.prev = node.prev;
@@ -82,7 +79,7 @@ public class AlternativeLinkedList2 {
 	public int count() {
 		int count = 0;
 		Node node = this.head.next;
-		while (node != this.tail) {
+		while (node.getClass() != DummyNode.class) {
 			node = node.next;
 			count++;
 		}
@@ -101,7 +98,7 @@ public class AlternativeLinkedList2 {
 			return;
 		}
 		Node node = this.head.next;
-		while (node != tail) {
+		while (node.getClass() != DummyNode.class) {
 			if (node.value == _nodeAfter.value) {
 				_nodeToInsert.prev = node;
 				_nodeToInsert.next = node.next;
@@ -119,15 +116,16 @@ class Node {
 	public int value;
 	public Node next;
 	public Node prev;
-	boolean isDummy;
 
 	public Node(int _value) {
 		value = _value;
 		next = null;
 		prev = null;		
 	}
-	
-	void setDummy() {
-		isDummy = true;
-	}
+}
+
+class DummyNode extends Node{
+	public DummyNode() {
+		super(0);
+	}	
 }
