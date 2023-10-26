@@ -43,8 +43,7 @@ public class AlternativeStack<T> {
 
 	public T peek() {
 		if(size == 0)
-			return null;
-		else
-			return head.value;
+			return null;		
+		return head.value;
 	}
 }
