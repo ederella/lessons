@@ -114,17 +114,18 @@ public class OrderedList<T> {
 				return;
 			
 			if(compareResult == 0){
-				if(node.prev == null)
-					this.head = node.next;
+				if(node == head) {
+					head = node.next;
+					return;
+				}
+				if(node == tail) {
+					tail = node.prev;
+					return;
+				}
+				node.prev.next = node.next;
+				node.next.prev = node.prev;
+				return;
 				
-				if(node.prev != null)
-					node.prev.next = node.next;
-				
-				if(node.next == null)
-					this.tail = node.prev;
-				
-				if(node.next != null)
-					node.next.prev = node.prev;
 			}
 			node = node.next;
 		}
