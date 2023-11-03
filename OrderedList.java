@@ -30,9 +30,8 @@ public class OrderedList<T> {
 		if(v1 instanceof Number){
 			Number n1 = (Number)v1;
 			Number n2 = (Number)v2;
-			double diff = n1.doubleValue() - n2.doubleValue();
-			double err = 0.0000001d;
-			return Math.abs(diff) < err ? 0 : diff > 0d ? 1 : -1;
+
+			return n1.doubleValue() == n2.doubleValue() ? 0 : n1.doubleValue() > n2.doubleValue() ? 1 : -1;
 		}
 		if(v1 instanceof String){
 			String s1 = ((String)v1).trim();
@@ -116,10 +115,14 @@ public class OrderedList<T> {
 			if(compareResult == 0){
 				if(node == head) {
 					head = node.next;
+					if(head!=null)
+						head.prev = null;
 					return;
 				}
 				if(node == tail) {
 					tail = node.prev;
+					if(tail!=null)
+						tail.next = null;
 					return;
 				}
 				node.prev.next = node.next;
