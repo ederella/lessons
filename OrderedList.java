@@ -117,12 +117,16 @@ public class OrderedList<T> {
 					head = node.next;
 					if(head!=null)
 						head.prev = null;
+					if(head == null)
+						tail = null;
 					return;
 				}
 				if(node == tail) {
 					tail = node.prev;
 					if(tail!=null)
 						tail.next = null;
+					if(tail == null)
+						head = null;
 					return;
 				}
 				node.prev.next = node.next;
@@ -160,4 +164,3 @@ public class OrderedList<T> {
 		return r;
 	}
 }
-
