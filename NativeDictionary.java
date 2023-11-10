@@ -20,7 +20,7 @@ class NativeDictionary<T>
 
 	public boolean isKey(String key) {
 		for (int i = 0; i < size; i++) {
-			if (slots[i].equals(key))
+			if (slots[i] != null && slots[i].equals(key))
 				return true;
 		}
 		return false;
