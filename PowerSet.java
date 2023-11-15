@@ -59,10 +59,7 @@ public class PowerSet {
 			if(!set2.get(s))
 				resultSet.put(s);
 		}
-		for(String s: set2.toArrayList()) {
-			if(!get(s))
-				resultSet.put(s);
-		}
+		
 		return resultSet;
 	}
 
