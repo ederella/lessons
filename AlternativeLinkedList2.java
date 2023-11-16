@@ -4,27 +4,24 @@ import java.util.ArrayList;
 
 public class AlternativeLinkedList2 {
 	public Node head;
-	public Node tail;
 	
 
 	public AlternativeLinkedList2() {
-		head = new DummyNode();		
-		tail = new DummyNode();
-		
-		head.next = tail;
-		tail.prev = head;
+		head = new DummyNode();
+		head.prev = head;
+		head.next = head;	
 	}
 
-	public void addInTail(Node _item) {
-		_item.prev = this.tail.prev;
-		_item.next = this.tail;
+	public void add(Node _item) {
+		_item.prev = head.prev;
+		_item.next = head;
 		_item.prev.next = _item;
-		 this.tail.prev = _item;
+		head.prev = _item;
 	}
 
 	public Node find(int _value) {
-		Node node = this.head.next;
-		while (node.getClass() != DummyNode.class) {
+		Node node = head.next;
+		while (!(node instanceof DummyNode)) {
 			if (node.value == _value)
 				return node;
 			node = node.next;
@@ -35,7 +32,7 @@ public class AlternativeLinkedList2 {
 	public ArrayList<Node> findAll(int _value) {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		Node node = this.head.next;
-		while (node.getClass() != DummyNode.class) {
+		while (!(node instanceof DummyNode)) {
 			if (node.value == _value)
 				nodes.add(node);
 			node = node.next;
@@ -46,7 +43,7 @@ public class AlternativeLinkedList2 {
 	public boolean remove(int _value) {
 		Node node = this.head.next;
 
-		while (node.getClass() != DummyNode.class) {
+		while (!(node instanceof DummyNode)) {
 			if (node.value == _value) {
 				node.prev.next = node.next;
 				node.next.prev = node.prev;
@@ -62,7 +59,7 @@ public class AlternativeLinkedList2 {
 	public void removeAll(int _value) {
 		Node node = this.head.next;
 		
-		while (node.getClass() != DummyNode.class) {
+		while (!(node instanceof DummyNode)) {
 			if (node.value == _value) {
 				node.prev.next = node.next;
 				node.next.prev = node.prev;
@@ -72,14 +69,14 @@ public class AlternativeLinkedList2 {
 	}
 
 	public void clear() {
-		head.next = tail;
-		tail.prev = head;
+		head.prev = head;
+		head.next = head;
 	}
 
 	public int count() {
 		int count = 0;
 		Node node = this.head.next;
-		while (node.getClass() != DummyNode.class) {
+		while (!(node instanceof DummyNode)) {
 			node = node.next;
 			count++;
 		}
@@ -98,7 +95,7 @@ public class AlternativeLinkedList2 {
 			return;
 		}
 		Node node = this.head.next;
-		while (node.getClass() != DummyNode.class) {
+		while (!(node instanceof DummyNode)) {
 			if (node.value == _nodeAfter.value) {
 				_nodeToInsert.prev = node;
 				_nodeToInsert.next = node.next;
