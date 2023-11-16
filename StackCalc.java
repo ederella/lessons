@@ -27,6 +27,16 @@ public class StackCalc {
 				stack2.push(stack2.pop() + stack2.pop());
 			}
 
+			if (s.equals("/")) {
+				int divider = stack2.pop();
+				stack2.push(stack2.pop() / divider);
+			}
+
+			if (s.equals("-")) {
+				int subtrahend = stack2.pop();
+				stack2.push(stack2.pop() - subtrahend);
+			}
+			
 			if (s.equals("=")) {
 				return stack2.pop();
 			}

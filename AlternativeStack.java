@@ -1,49 +1,32 @@
 package alternativeStack;
 
+import java.util.LinkedList;
 
 public class AlternativeStack<T> {
-	class Node {
-		T value;
-		Node next;
-		Node(T value) {
-			this.value = value;
-		}
-	}
-	Node head;
-
-	private int size;
 	
+	LinkedList<T> storage;
+
 	public AlternativeStack() {
-		head = null;
+		storage = new LinkedList<T>();
 	}
 
 	public int size() {
-		return size;
+		return storage.size();
 	}
 
 	public T pop() {
-		if (size == 0)
+		if (size() == 0)
 			return null;
-		T val = head.value;
-		head = head.next;
-		size--;
-		return val;
+		return storage.pop();
 	}
 
 	public void push(T val) {
-		Node node = new Node(val);
-		
-		if (this.head == null)
-			this.head = node;
-
-		node.next = head;
-		head = node;
-		size++;
+		storage.push(val);
 	}
 
 	public T peek() {
-		if(size == 0)
+		if(size() == 0)
 			return null;		
-		return head.value;
+		return storage.peek();
 	}
 }

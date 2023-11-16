@@ -17,10 +17,6 @@ public class StackCheckParenthesis {
 				stack.push(ch);
 		}
 
-		if (stack.size() == 0)
-			return true;
-
-		return false;
-
+		return stack.size() == 0;
 	}
 }
