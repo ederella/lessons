@@ -3,6 +3,7 @@ package alternativeStack;
 import java.util.Stack;
 
 public class StackCalc {
+
 	public static int postfixCalc(String string) {
 
 		String arr[] = string.split(" ");
@@ -15,27 +16,16 @@ public class StackCalc {
 
 		while (stack1.size() > 0) {
 			String s = stack1.pop();
+			
 			if (s.matches("\\d+")) {
 				stack2.push(Integer.valueOf(s));
 			}
 
-			if (s.equals("*")) {
-				stack2.push(stack2.pop() * stack2.pop());
-			}
-
-			if (s.equals("+")) {
-				stack2.push(stack2.pop() + stack2.pop());
-			}
-
-			if (s.equals("/")) {
-				int divider = stack2.pop();
-				stack2.push(stack2.pop() / divider);
-			}
-
-			if (s.equals("-")) {
-				int subtrahend = stack2.pop();
-				stack2.push(stack2.pop() - subtrahend);
-			}
+			if (s.matches("\\*|\\+|\\/|\\-")) {
+				int operand1 = stack2.pop();
+				int operand2 = stack2.pop();
+				stack2.push(doOperation(operand1, operand2, s));
+			}			
 			
 			if (s.equals("=")) {
 				return stack2.pop();
@@ -43,5 +33,21 @@ public class StackCalc {
 		}
 
 		return 0;
+	}
+
+	private static Integer doOperation(int operand1, int operand2, String operation) {
+		if (operation.equals("+"))
+			return operand1 + operand2;
+		
+		if (operation.equals("*"))
+			return operand1 * operand2;
+		
+		if (operation.equals("-"))
+			return operand2 - operand1;
+		
+		if (operation.equals("/"))
+			return operand2 / operand1;
+		
+		throw new UnsupportedOperationException();
 	}
 }
