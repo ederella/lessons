@@ -1,0 +1,89 @@
+3.1.
+	public class UploadManager - public class Uploader
+
+	public class MessageManager - public class MessageGenerator
+	
+	public class GuaranteeInfo - public class Guarantee
+	
+	public class PartialPaymentInfo - public class PartialPayment
+	
+	public class BureauInfoCollection - public class BureauMap
+	
+3.2
+	//Поскольку проект изначально создавали и поддерживали турки, старые части написаны частично на турецком языке.
+		//1
+		//было
+		public static CBBag swiftbankagetir(CBBag inBag){...}; 
+		//стало
+		public static CBBag getSWIFTParameters(CBBag inBag){...};
+
+		//2
+		//было		
+		private static CBBag hesapBilgileriGetir(String hesapNo){...};
+		//стало		
+		private static CBBag getAccountDetails(String accountNumber){...};
+
+		//3
+		//было		
+		protected static CBBag tahsilatBilgisiGetir(long odemeSatiriOID){...};
+		//стало		
+		protected static CBBag getPaymentDetails(long paymentOID){...};
+		
+		//4
+		//было
+		public class GunSonuKontrol{
+			public static CBBag logOlustur(CBBag inBag){...};//пишет лог
+			public static CBBag kontrolGozlem(CBBag inBag) throws cb.smg.general.utility.CBException {...}//читает лог	
+		}		
+		//стало
+		public class EndOfDayLogger{
+			public static CBBag write(CBBag inBag){...};
+			public static CBBag read(CBBag inBag) throws cb.smg.general.utility.CBException {...}			
+		}
+		
+		//5
+		//было
+		public class OdemePlani{
+			public static CBBag yarat(CBBag inBag){...}; //создать
+			void guncelle(CBBag inBag){...}; //обновить
+			public static CBBag bilgiGetir(CBBag inBag){...};//получить информацию
+			...
+		}
+		//стало
+		public class PaymentPlan{
+			public static CBBag create(CBBag inBag){...};
+			void update(CBBag inBag){...};
+			public static CBBag get(CBBag inBag){...};
+			...
+		}
+		//6
+		//было
+		public class Kurlar {
+			public static void kurGuncelle(CBBag inBag){...}; //обновить
+			public static int kurVarmi(String dovizCinsi, String kurTarihi, String bankaTipi){...}; //есть ли курс валюты ?
+			...
+		}
+		//стало
+		public class ExchangeRate {
+			public static void update(CBBag inBag){...};
+			public static int getRateDefinedState(String dovizCinsi, String kurTarihi, String bankaTipi){...};
+			...
+		}
+		
+		//7
+		//было
+		public class Musteri {
+			public static CBBag musteriGetir(CBBag inBag){...};
+			public static void musteriNoAl(MusteriPOMData m) throws CBException {...};
+			public static boolean musteriNoDogrula(CBBag inBag) throws CBException {...};
+			...
+		}
+		//стало
+		public class Customer {
+			public static CBBag get(CBBag inBag){...};
+			public static void generateCustomerNo(MusteriPOMData m) throws CBException {...};
+			public static boolean checkCustomerNo(CBBag inBag) throws CBException {...};
+			...
+		}		
+		
+		
