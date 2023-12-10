@@ -1,0 +1,206 @@
+//1
+//было - название функции некорректно описывает ее назначение, а так же функция находится не в подходящем классе
+
+public class Utility{
+	...
+	public static void updateAgreementAndCredits(CBBag inBag) throws CBException {
+			try {
+				LoanAgreement.updateAgreementReservationAmount(inBag); 
+				LoanAgreement.updateCreditReservationsOfTheAgreement(inBag);
+			} catch (CBException ex) {
+				...
+			}
+		}
+}
+//стало
+public class LoanAgreement{
+	public static void updateReservationAmounts(CBBag inBag) throws CBException {
+			try {
+				updateAgreementReservationAmount(inBag);
+				updateCreditReservationsOfTheAgreement(inBag);
+			} catch (CBException ex) {
+				...
+			}
+		}
+}
+
+
+//2
+//было - опечатка в названии функции, она сравнивает старые и новые значения и обновляет старые, если они не равны новым
+		
+	public static void compareAndChangeRelatedCollateralsPirces(CollateralMasterPOMData newPomData) throws CBException{
+		...
+		try {
+			...
+			while (qe.next()) {
+				...
+				
+				if(oldPomData.collateralAmount.compare(newPomData.collateralAmount) != 0)
+					oldPomData.collateralAmount = newPomData.collateralAmount;
+				
+				if(oldPomData.collateralAmountDefaultCur.compare(newPomData.collateralAmountDefaultCur) != 0)
+					oldPomData.collateralAmountDefaultCur = newPomData.collateralAmountDefaultCur;
+				
+				if(oldPomData.marketAmount.compare(newPomData.marketAmount) != 0)
+					oldPomData.marketAmount = newPomData.marketAmount;
+
+				oldPom.setCollateralMasterPOMData(oldPomData);
+				oldPom.update();
+			}
+		} catch (CBException e) {
+			...
+		}		
+	}
+	
+// стало - так как обновление происходит в любом случае, уберем сравнение и переименуем функцию
+	public static void updateRelatedCollateralsPrices(CollateralMasterPOMData newPomData) throws CBException{
+		...
+		try {
+			...
+			while (qe.next()) {
+				...
+				
+				oldPomData.collateralAmount = newPomData.collateralAmount;				
+				oldPomData.collateralAmountDefaultCur = newPomData.collateralAmountDefaultCur;
+				oldPomData.marketAmount = newPomData.marketAmount;
+
+				oldPom.setCollateralMasterPOMData(oldPomData);
+				oldPom.update();
+			}
+		} catch (CBException e) {
+			...
+		}		
+	}
+	
+//3
+//было
+public static CBBag sendOperationForDocumentSigningHolidayOrInstant(CBBag inBag) throws CBException//отправляет на подпись кредитные документы для 2 типов кредитов
+//стало
+public static CBBag sendDocumentsForSigningHoliday(CBBag inBag) throws CBException
+public static CBBag sendDocumentsForSigningInstant(CBBag inBag) throws CBException
+
+//4
+//было
+public static CBBag getAddressAndDateSpecTypeRegistrationAddress(CBBag inBag, String type) throws CBException //возвращает данные по адресу определенного типа
+//стало
+public static CBBag getAddressByType(CBBag inBag, String type) throws CBException
+
+//5
+//было
+public static CBBag deactivateActivateShopReasonIsInvestigation(CBBag inBag) throws CBException//выполняет активацию/деактивацию торговой точки в любом случае
+//стало
+public static CBBag updateShopActivationState(CBBag inBag) throws CBException
+
+
+//6
+//было
+public static void sendMailIfAddServSatelliteMonitoringDeviceInstallation(CBBag inBag) throws CBException//отправляет мэйл, если с кредитом выдан определенный вид доп.услуги
+//стало
+public static boolean existsAddServSatelliteMonitoring(CBBag inBag) throws CBException //проверяем наличие доп.услуги
+public static void sendMail(CBBag inBag) throws CBException //отправляем мэйл
+
+
+//7
+//было
+//функции, выполняющие разные операции по дополнительным услугам, выдаваемым вместе с кредитом, находятся в одном огромном классе AdditionalService.java
+AdditionalService.java
+	private static void checkAdditionalServiceOperationAlternativeAssistance(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws CBException
+	private static void checkAdditionalServiceOperationAutosalon(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws CBException 
+	private static void checkAdditionalServiceOperationGAP(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws CBException
+	private static void checkAdditionalServiceOperationKASKO(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws CBException
+	private static void checkAdditionalServiceOperationLifeRenessainse(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws  CBException
+	private static void checkAdditionalServiceOperationLifeAlpha(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount) throws CBException
+	public static CBBag getAddServGAPPolicyNumber(CBBag inBag) throws CBException
+	public static CBBag getAddServKaskoPolicyNumber(CBBag inBag) throws CBException
+	public static CBBag getAddServRenaissancePolicyNumber (CBBag inBag) throws CBException
+	public static CBBag getAddServAlphaPolicyNumber (CBBag inBag) throws CBException
+	
+//стало
+	addserv
+		AddServAlternativeAssistance.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+		AddServAutosalon.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+		AddServGAP.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+			public static CBBag getPolicyNumber(CBBag inBag) throws CBException
+		AddServKASKO.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+			public static CBBag getPolicyNumber(CBBag inBag) throws CBException
+		AddServLifeRenessainse.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+			public static CBBag getPolicyNumber(CBBag inBag) throws CBException
+		LifeRenessainseLifeAlpha.java
+			private static void check(CBBag inBag, CBBag outBag, CBBag addServBag, String serviceType, String operation, int addServCount)
+			public static CBBag getPolicyNumber(CBBag inBag) throws CBException
+		
+	
+//8
+//было
+public static CBBag getInformationIfDummyShop (CBBag inBag) throws CBException // возвращает разновидность торговой точки относительно денежных переводов
+//стало
+public static CBBag getShopReceiverType (CBBag inBag) throws CBException
+	
+
+//9
+//было
+public static CBBag checkFieldsIfEmtyOrDuplicated (CBBag inBag) throws CBException //проверяет корректность заполнения полей ПТС и ЕПТС
+//стало
+public static CBBag checkPTSandEPTS (CBBag inBag) throws CBException //поля надо проверять вместе, поэтому остается один метод, однако проверяется не только дублируются они или пустые
+
+//10
+//было
+	anketa.Carloan.java
+		public static CBBag generateBagkeysForCarLoanAnketa(CBBag inBag) throws CBException
+			
+//стало
+	anketa.Carloan.java
+		public static CBBag generateBagkeys(CBBag inBag) throws CBException
+//11
+//было
+	anketa.HolidayLoan.java
+		public static CBBag generateBagkeysForHolidayLoanAnketa(CBBag inBag) throws CBException
+//стало
+	anketa.HolidayLoan.java
+		public static CBBag generateBagkeys(CBBag inBag) throws CBException
+
+//12
+//было
+	anketa.InstantLoan.java
+		public static CBBag generateBagkeysForInstantLoanAnketa(CBBag inBag) throws CBException
+//стало
+	anketa.InstantLoan.java
+		public static CBBag generateBagkeys(CBBag inBag) throws CBException
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
