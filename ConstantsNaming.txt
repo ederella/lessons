@@ -1,0 +1,191 @@
+//1
+	//было
+	public static final String[] closedLoanStatuses = new String[]{"8"};
+	public static final String[] closedLoanStatuses2 = new String[]{"8","C"};
+	public static final String[] closedLoanStatuses3 = new String[]{"8","C", "W", "L"};
+	public static final String[] openLoanStatuses = new String[]{"1"};
+	public static final String[] openLoanStatuses2 = new String[]{"1","D"};
+	public static final String[] openLoanStatuses3 = new String[]{"1","D", "W"};
+	public static final String[] soldLoanStatuses = new String[]{"L"};
+	public static final String[] inactiveLoanStatuses = new String[]{"0", "N"};
+	public static final String[] autoRejectedLoanStatuses = new String[]{"A"};
+	public static final String[] securityRejectedLoanStatuses = new String[]{"3"};
+	public static final String[] firstIssuedStatuses = new String[]{"1", "8", "L", "C", "D", "W"};
+	public static final String[] lastIssuedStatuses = new String[]{ "1", "8", "L", "C", "D", "W"};
+	public static final String[] cancelledLoanStatuses = new String[]{"4", "5"};
+	public static final String[] wrrittenOfLoanStatuses = new String[]{"W"};
+	public static final int activenessClosed = 0;
+	public static final int activenessOpen = 1;
+	
+	//стало - корректный нэйминг для констант
+	// closedLoanStatuses - удалила, так как не используется
+	public static final String[] LOAN_STATES_CLOSED = new String[]{"8","C"};
+	public static final String[] LOAN_STATES_CLOSED_WRITTEN_SOLD = new String[]{"8","C", "W", "L"};
+	// openLoanStatuses - удалила, так как не используется
+	public static final String[] LOAN_STATES_OPEN = new String[]{"1","D"};
+	public static final String[] LOAN_STATES_OPEN_WRITTEN = new String[]{"1","D", "W"};
+	public static final String[] LOAN_STATES_SOLD = new String[]{"L"};
+	public static final String[] LOAN_STATES_INACTIVE = new String[]{"0", "N"};
+	public static final String[] LOAN_STATES_AUTO_REJECTED = new String[]{"A"};
+	public static final String[] LOAN_STATES_REJECTED = new String[]{"3"};
+	public static final String[] LOAN_STATES_FOR_FIRST_ISSUE_DATE = new String[]{"1", "8", "L", "C", "D", "W"};
+	public static final String[] LOAN_STATES_FOR_LAST_ISSUE_DATE = new String[]{ "1", "8", "L", "C", "D", "W"};
+	public static final String[] LOAN_STATES_CANCELLED = new String[]{"4", "5"};
+	public static final String[] LOAN_STATES_WRITTEN = new String[]{"W"};
+	public static final int ACTIVENESS_CLOSED = 0;
+	public static final int ACTIVENESS_OPEN = 1;
+	
+//2
+	//было	
+	...
+	catch (CBException e) {
+			if (e.id == 10002) // код сообщения об ошибке
+			{...}
+	}...
+	
+	//стало
+	class Exceptions {
+		public static final int ACCOUNT_IS_NOT_FOUND = 10002;
+	}	
+		...
+	catch (CBException e) {
+			if (e.id == Exceptions.ACCOUNT_IS_NOT_FOUND) {...}
+	}...
+	
+//3
+	//было	
+	if(currentTime.greaterThan(new CBTime("210000"))){...}//время начала "Конца дня" - end-of-day - 21:00:00
+	
+	//стало
+	public static final CBTime EOD_START = new CBTime("210000");
+	if(currentTime.greaterThan(EOD_START){...}
+
+//4
+	//было
+	public static void closeAccount(long accountOID) throws CBException{
+		try{
+			if (accountOID > 0){
+				CBBag tempBag = CBBagFactory.createBag();
+				tempBag.put(ACCOUNTOID, accountOID);
+				CBCaller.call("HESAP_HESAPKAPAT", tempBag);
+			}
+		}catch (CBException e){
+			if (e.id != 10009){
+				throw e;
+			}
+		}
+	}
+	//стало
+	class Exceptions {
+		public static final int ACCOUNT_IS_CLOSED = 10009;
+	}
+	
+	public static void closeAccount(long accountOID) throws CBException{
+		try{
+			if (accountOID > 0){
+				CBBag tempBag = CBBagFactory.createBag();
+				tempBag.put(ACCOUNTOID, accountOID);
+				CBCaller.call("HESAP_HESAPKAPAT", tempBag);
+			}
+		}catch (CBException e){
+			if (e.id != Exceptions.ACCOUNT_IS_CLOSED){
+				throw e;
+			}
+		}
+	}
+
+//5
+	//было
+	int kaskoPeriod = carInsurance.getInsurancePeriod(); 
+	if (kaskoPeriod * 12 > cred_duration) {...} //12 - месяцев в году, срок КАСКО задан в годах
+	
+	//стало
+	public static final int YEAR_MONTHS_COUNT = 12;
+	
+	int kaskoPeriod = carInsurance.getInsurancePeriod(); 
+	if (kaskoPeriod * YEAR_MONTHS_COUNT > cred_duration) {...}
+	
+	
+//6
+	//было
+	CBCurrency DTI = Utils.getLastScoringDTIValue(creditBag.get(PRODUCTREFNO).toSimpleLong());
+			
+	if (DTI.compare(CBCurrencyFactory.newCBCurrency(50)) > 0) //магическая константа  - пороговое значение ПДН
+		datBag.put(EXPENSES, "1");
+
+	
+	//стало
+	public static final CBCurrency DTI_MAX_BORDER = CBCurrencyFactory.newCBCurrency(50);
+	
+	CBCurrency DTI = Utils.getLastScoringDTIValue(creditBag.get(PRODUCTREFNO).toSimpleLong());
+			
+	if (DTI.compare(DTI_MAX_BORDER) > 0) 
+		datBag.put(EXPENSES, "1");
+	
+//7
+	//было
+	if (creditType.equalsIgnoreCase("300553") || creditType.equalsIgnoreCase("300550")) {...}
+				
+	//стало
+	public static final String INSTANT_CREDIT = "300553";
+	public static final String AUTO_CREDIT = "300550";
+	
+	if (creditType.equals(INSTANT_CREDIT) || creditType.equals(AUTO_CREDIT)) {...}
+	
+				
+//8
+	//было	
+	if (inBag.get(FCID).toString().equalsIgnoreCase("060")){
+		...}
+	else if (inBag.get(FCID).toString().equalsIgnoreCase("001")){
+		...}
+	
+	//стало	
+	public static final String CHANNEL_BRANCH = "001";
+	public static final String CHANNEL_FRONTEND = "060";
+	
+	if (inBag.get(FCID).toString().equals(CHANNEL_FRONTEND)){
+		...}
+	else if (inBag.get(FCID).toString().equals(CHANNEL_BRANCH)){
+		...}
+	
+//9
+	//было	
+	if (inBag.get(CREDITSTATUS).toString().equals("W")) { //константа, означающаяя статус кредита - "списан"
+		...}
+	//стало	
+	public static final String CREDIT_STATE_WRITTEN_OFF = "W";		
+	if (inBag.get(CREDITSTATUS).toString().equals(CREDIT_STATE_WRITTEN_OFF)) {
+		...}
+		
+		
+//10
+	//было	
+	private static final String productOperationsCodes[] = {"002", "901", "001", "902", "903"};
+	
+	//стало - корректный нэйминг
+	private static final String PRODUCT_OPERATIONS_CODES[] = {"002", "901", "001", "902", "903"};
+	
+//11
+	//было	
+	private static final String foreignExchangeOperationTypeBuying = "SA";
+	private static final String foreignExchangeOperationTypeSelling = "SS";
+	private static final String foreignExchangeOperationTypeParity = "SP";
+	
+	//стало - корректный нэйминг
+	private static final String FOREIGN_EXCHANGE_BYING = "SA";
+	private static final String FOREIGN_EXCHANGE_SELLING  = "SS";
+	private static final String FOREIGN_EXCHANGE_PARITY = "SP";	
+	
+//12
+	//было		
+	outBag.put(PAYERINN,"7705148464");
+	outBag.put(PAYERKPP,"775001001");
+	
+	//стало
+	private static final String CEB_INN = "7705148464";
+	private static final String CEB_KPP = "775001001";
+	
+	outBag.put(PAYERINN, CEB_INN);
+	outBag.put(PAYERKPP, CEB_KPP);
+	
