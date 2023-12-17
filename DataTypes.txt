@@ -1,0 +1,248 @@
+//1
+	//было
+	if((id.maturityDate.difference(id.operationDate))/365 != addInfoBag.get(TERM).toSimpleInt()|| !productType.equals(inBag.get(SERVICEINFOS, i, PRODUCTCODE).toString()){
+				CBBag numBag = CBCaller.call("CRED_ADDSERV_GET_RAT_CERTIFICATE_NUMBER", inBag);
+				if(numBag.existsBagKey(NUMBER))
+					id.certNumber = numBag.get(NUMBER).toString();
+	}	
+	
+	//стало - добавлены переменные для улучшения читаемости кода
+	
+	boolean isProductTypeChanged = !productType.equals(inBag.get(SERVICEINFOS, i, PRODUCTCODE).toString());
+	int addServTermInYears = id.maturityDate.difference(id.operationDate))/365;
+	if(( addServTermInYears != addInfoBag.get(TERM).toSimpleInt()|| isProductTypeChanged){
+			CBBag numBag = CBCaller.call("CRED_ADDSERV_GET_RAT_CERTIFICATE_NUMBER", inBag);
+			if(numBag.existsBagKey(NUMBER))
+				id.certNumber = numBag.get(NUMBER).toString();
+	}	
+	
+	
+//2
+	//было
+		if(inBag.existsBagKey(RECEIVERCODE) && inBag.get(RECEIVERCODE).toString().equals("H")){
+			AdditionalService.putHoldsAllSkipTypes(inBag, msd.customerAccountOid, exchangeCode, ADDSERVTYPE_AUTOSALON);	
+		}
+		
+	//стало - добавлена булева переменная для улучшения читаемости
+		boolean isHandInHandOrg = inBag.existsBagKey(RECEIVERCODE) && inBag.get(RECEIVERCODE).toString().equals("H");
+		if(isHandInHandOrg){
+			AdditionalService.putHoldsAllSkipTypes(inBag, msd.customerAccountOid, exchangeCode, ADDSERVTYPE_AUTOSALON);	
+		}
+		
+//3
+	//было
+		if (cBag.get(VALUEDATE_).toCBDate().equals(inBag.get(CREDITDATE).toCBDate())
+		{
+			CBBag newPaymentPlan = getNewPaymentPlan(inBag);
+			newPaymentPlan.copyTo(inBag);
+			...
+		}
+	
+	//стало - добавлена булева переменная для улучшения читаемости
+		boolean valueDateHasChanged = !iBag.get(VALUEDATE_).toCBDate().equals(inBag.get(CREDITDATE).toCBDate());
+			
+		if (valueDateHasChanged)
+		{
+			CBBag newPaymentPlan = getNewPaymentPlan(inBag);
+			newPaymentPlan.copyTo(inBag);
+			...
+		}
+
+//4
+	//было
+		if(inBag.get(PRODUCTCODE).toSimpleInt() == RetailLoanConstants.CREDIT_CARD 
+			&& inBag.existsBagKey(ADDITIONALINFO) 
+			&& inBag.get(ADDITIONALINFO).toString().length() > 0 
+			&& phoneType.equals(CONTACT_TELEPHONE_HOME)){
+	        	phoneFullNo =
+	        		inBag.get(TELEPHONE, i, COUNTRYCODE_).toString().trim()
+	        		+ inBag.get(TELEPHONE, i, FIELDCODE).toString().trim()
+	        		+ inBag.get(TELEPHONE, i, TELEPHONENO).toString().trim();
+        		contactPhones.add(phoneFullNo);
+        	}
+	
+	//стало - добавлены переменные для улучшения читаемости кода
+		boolean isCreditCard = inBag.get(PRODUCTCODE).toSimpleInt() == RetailLoanConstants.CREDIT_CARD;		
+		boolean existsCardAddInfo =  inBag.existsBagKey(ADDITIONALINFO) && inBag.get(ADDITIONALINFO).toString().length() > 0;
+		
+		if(isCreditCard && existsCardAddInfo && phoneType.equals(CONTACT_TELEPHONE_HOME)){
+	        	phoneFullNo =
+	        		inBag.get(TELEPHONE, i, COUNTRYCODE_).toString().trim()
+	        		+ inBag.get(TELEPHONE, i, FIELDCODE).toString().trim()
+	        		+ inBag.get(TELEPHONE, i, TELEPHONENO).toString().trim();
+        		contactPhones.add(phoneFullNo);
+        	}
+
+//5
+	//было
+		 paympat += value.floatValue() == 1.25f? "B" : value.floatValue() == 1.75f? "C"  : String.valueOf(value.intValue());
+	
+	//стало - избегаем сравнения на равенство для чисел с плавающей точкой
+		String paympatPart = value.toString();
+		paympat += paympatPart.equals("1.25")? "B" : paympatPart.equals("1.75")? "C"  : paympatPart;
+	
+
+//6
+	//было
+	private static double getAverageDayDiff(CBBag inBag, int startIndex) throws CBException
+	{		
+		int ppCount = inBag.getSize(PAYMENTPLAN);
+		
+		double dayDiffSum = 0;
+		
+		for(int i = startIndex; i < ppCount; i++){
+			
+			int dayDifference = inBag.get(PAYMENTPLAN, i, NUMBEROFDAYS).toSimpleInt();
+			
+			dayDiffSum = dayDiffSum + dayDifference;
+		}
+		
+		return (double)dayDiffSum/(ppCount-1);
+	}
+	
+	//стало	- заменяем double  на int
+	private static double getAverageDayDiff(CBBag inBag, int startIndex) throws CBException
+	{		
+		int ppCount = inBag.getSize(PAYMENTPLAN);
+		
+		int dayDiffSum = 0;
+		
+		for(int i = startIndex; i < ppCount; i++){
+			
+			int dayDifference = inBag.get(PAYMENTPLAN, i, NUMBEROFDAYS).toSimpleInt();
+			
+			dayDiffSum +=dayDifference;
+		}
+		
+		return (double)dayDiffSum/(ppCount - 1);
+	}
+	
+//7
+	//было
+	while(decision.equalsIgnoreCase("1") && orderNumber < queriedBureau.getSize()){
+		...					
+		if (bureaServiceType.equals("EXUC")) {
+		...
+		}
+		else if (bureaServiceType.equals("NBCH")){
+		...
+		}
+		else if(bureaServiceType.equals("EQUC")) {
+		...
+		}
+		else if (bureaServiceType.equals("MEGA")) {
+		...
+		}
+		else if (bureaServiceType.equals("BLNE")) {
+		...
+		}
+		else if(bureaServiceType.equals("SPCI")){
+		...
+		}
+		...}
+		
+	//стало	- используем константы вместо "магичских строк"
+		public static final String EXPERIAN_SCORING = "EXUC";
+		public static final String NBCH_SCORING = "NBCH";
+		public static final String EQUIFAX_SCORING = "EQUC";
+		public static final String MEGAFON_SCORING = "MEGA";
+		public static final String BEELINE_SCORING = "BLNE";
+		public static final String SPECTRUM_SCORING = "SPCI";
+		
+		while(decision.equalsIgnoreCase("1") && orderNumber < queriedBureau.getSize()){
+		...					
+		if (bureaServiceType.equals(EXPERIAN_SCORING)) {
+		...
+		}
+		else if (bureaServiceType.equals(NBCH_SCORING)){
+		...
+		}
+		else if(bureaServiceType.equals(EQUIFAX_SCORING)) {
+		...
+		}
+		else if (bureaServiceType.equals(MEGAFON_SCORING)) {
+		...
+		}		
+		else if (bureaServiceType.equals(BEELINE_SCORING)) {
+		...
+		}
+		else if(bureaServiceType.equals(SPECTRUM_SCORING)){
+		...
+		}
+		...}		
+		
+		
+		
+//8
+	//было
+	if (inBag.get(OPERATIONTYPE).toString().equalsIgnoreCase("A")){...}
+	
+	//стало	 - добавлена булева переменная для улучшения читаемости
+	boolean isAdd = inBag.get(OPERATIONTYPE).toString().equalsIgnoreCase("A");
+	if(isAdd){...}
+	
+//9
+	//было
+	if (inBag.get(OPERATIONTYPE).toString().equalsIgnoreCase("D")){..}
+	
+	//стало	- добавлена булева переменная для улучшения читаемости
+	boolean isDelete = inBag.get(OPERATIONTYPE).toString().equalsIgnoreCase("D");
+	if(isDelete){...}
+	
+//10
+	//было
+	if (!(inBag.existsBagKey(SUBSIDIARYLEDGER) && inBag.get(SUBSIDIARYLEDGER).toBoolean())
+		&& !(inBag.existsBagKey(DISCOUNTED) && inBag.get(DISCOUNTED).toBoolean()){...}
+	
+	//стало	-  добавлены булевы переменные для улучшения читаемости
+	boolean isSubsidy = inBag.existsBagKey(SUBSIDIARYLEDGER) && inBag.get(SUBSIDIARYLEDGER).toBoolean();
+	boolean isSubsidyWithDiscount = inBag.existsBagKey(DISCOUNTED) && inBag.get(DISCOUNTED).toBoolean();
+	
+	if (!isSubsidy && !isSubsidyWithDiscount){...}
+	
+	
+//11
+	//было
+	if(inBag.existsBagKey(URUNKODU) 
+		&& inBag.get(URUNKODU).toString().length()> 0 
+		&& inBag.existsBagKey(URUNISLEMKODU) 
+		&& inBag.get(URUNISLEMKODU).toString().length() > 0){...}
+	
+	//стало	
+	boolean existsProductCode = inBag.existsBagKey(URUNKODU) && inBag.get(URUNKODU).toString().length()> 0;
+	boolean existsProductOperationCode = inBag.existsBagKey(URUNISLEMKODU) && inBag.get(URUNISLEMKODU).toString().length()> 0;
+	
+	if(existsProductCode && existsProductOperationCode){...}
+	
+//12
+	//было
+	if(inBag.existsBagKey(RECEIVEROID)	&& inBag.get(RECEIVEROID).toString() != null && inBag.get(RECEIVEROID).toString().trim().length() > 0){
+			for (int i = 0; i < equipCount; i++){			
+				CBBag equipBag = getEquipPaymentReceiverInfo(inBag, i);
+							
+				totalPayments = totalPayments.add(equipBag.get(LOANAMOUNTTOBETRANSFERRED).toCBCurrency());
+				
+				equipBag.put(SHOPOID, defineShopOid(inBag));		
+							
+				CBBag recBag = prepareCarLoanPDReceiverInfo(equipBag, TRANSFER_TYPE_EQUIPMENT, inBag.get(EQUIPMENT, i, OID).toSimpleLong());
+						
+				createFMTShopPayment(recBag);						
+			}
+	
+	//стало	
+	
+	boolean isFMTPaymentReceiverSelected = inBag.existsBagKey(RECEIVEROID)	&& inBag.get(RECEIVEROID).toString() != null && inBag.get(RECEIVEROID).toString().trim().length() > 0;
+	if(isFMTPaymentReceiverSelected){
+			for (int i = 0; i < equipCount; i++){			
+				CBBag equipBag = getEquipPaymentReceiverInfo(inBag, i);
+							
+				totalPayments = totalPayments.add(equipBag.get(LOANAMOUNTTOBETRANSFERRED).toCBCurrency());
+				
+				equipBag.put(SHOPOID, defineShopOid(inBag));		
+							
+				CBBag recBag = prepareCarLoanPDReceiverInfo(equipBag, TRANSFER_TYPE_EQUIPMENT, inBag.get(EQUIPMENT, i, OID).toSimpleLong());
+						
+				createFMTShopPayment(recBag);						
+			}
+	
+	
