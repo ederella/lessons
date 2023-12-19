@@ -47,9 +47,9 @@
 		throw new CBException();
 	}
 	
-	//стало
+	//стало - не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 	private static int findProfitAgainstIndex(int index, CBBag inBag) throws CBException {
-		long ticketNo = inBag.get(FISNOTABLE, index, FISNO).toSimpleLong();
+		final long ticketNo = inBag.get(FISNOTABLE, index, FISNO).toSimpleLong();
 
 		for (int i = 0; i < inBag.getSize(FISNOTABLE); i++) {
 			if (inBag.get(FISNOTABLE, i, FISNO).toSimpleLong() == ticketNo && i != index) {
@@ -78,7 +78,7 @@
 		}
 	}
 	
-	//стало
+	//стало	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 		private void remUncollPayment(HistoryRecord curHr) {
 
 		if (unCollHrs == null)
@@ -113,14 +113,14 @@
 				}
 			}
 			
-	//стало			
+	//стало		- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла		
 
 			for(int i = 0; i < tableFromScreen; i++){
 				sumOfServicesPriceFromScreen = sumOfServicesPriceFromScreen.add(inBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
 			}
 
 			for(int i = 0; i < tableFromDB; i++){
-					sumOfServicesPriceFromDB = sumOfServicesPriceFromDB.add(creditBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+				sumOfServicesPriceFromDB = sumOfServicesPriceFromDB.add(creditBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
 			}
 
 //5
@@ -142,9 +142,9 @@
         
     }
 	
-	//стало
+	//стало 	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 	 private static CBCurrency getTotalAddServCost(CBBag inBag) throws CBException {
-		int asCount = inBag.getSize(SERVICEINFOS);
+		final int asCount = inBag.getSize(SERVICEINFOS);
 
 		CBCurrency totalCost = CBCurrency.ZERO;
 
@@ -176,7 +176,7 @@
 		}
 		
 		
-	//стало
+	//стало	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 		//process main period
 			for(int i = 0; i < loanPeriodCount; i++){
 			
@@ -198,7 +198,8 @@
 				for(; i < curPPBag.getSize(PAYMENTPLAN); i++){
 					put(curPPBag, i, FIRSTPAYMENTDATE, get(curPPBag, i, LASTPAYMENTDATE).toCBDate());
 				}
-	//стало
+				CBDate maturityDate = curPPBag.get(PAYMENTPLAN, i- 1, LASTPAYMENTDATE).toCBDate();
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 				int paymentPlanSize = curPPBag.getSize(PAYMENTPLAN);
 				for (int i = 0; i < paymentPlanSize; i++) {
 					put(curPPBag, i, FIRSTPAYMENTDATE, get(curPPBag, i, LASTPAYMENTDATE).toCBDate());
@@ -224,7 +225,7 @@
 		for(; i < asCount; i++){...}
 		return outBag;
 		
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, инициализируем переменные в местах их использования
 	public static CBBag checkRatCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
 
 		CBBag outBag = CBBagFactory.createBag();
@@ -237,7 +238,7 @@
 		String ratCardPrefix = "";
 		boolean isValidCardNumber = false;
 		
-		int asCount = inBag.getSize(SERVICEINFOS);	
+		final int asCount = inBag.getSize(SERVICEINFOS);	
 		for(int i = 0; i < asCount; i++){...}
 		return outBag;	
 		
@@ -282,7 +283,7 @@
 
 	}
 	
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 	public static CBBag checkAltrAssistCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
 
 		CBBag outBag = CBBagFactory.createBag();
@@ -356,9 +357,9 @@
 					}        	        
 				}
 				
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 				if (inBag.existsBagKey(TABLE1, 0, EQUIPMENT1)) {
-					int asCount = inBag.getSize(TABLE1);
+					final int asCount = inBag.getSize(TABLE1);
 
 					for (int i = 0; i < asCount; i++) {
 						docBag.put(EQUIPMENT, i, NUMBERA, i + 1);
@@ -369,7 +370,7 @@
 				}
 
 				if (inBag.existsBagKey(TABLE2, 0, SERVICENAME)) {
-					int asCount = inBag.getSize(TABLE2);
+					final int asCount = inBag.getSize(TABLE2);
 
 					for (int i = 0; i < asCount; i++) {
 						docBag.put(SERVICEINFOS, i, SERVICENAME1, inBag.get(TABLE2, i, SERVICENAME).toString());
@@ -421,13 +422,13 @@
 		}
 	}
 	
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, создаем переменную там, где впервые используем
 	
 	public static void putHoldsSkipDummyShops(CBBag inBag, long customerAccOid, String exchangeCode) throws CBException {
 		...
 		try {
 		
-			int addServCount = inBag.getSize(SERVICEINFOS);
+			final int addServCount = inBag.getSize(SERVICEINFOS);
 
 			for(int i = 0; i < addServCount; i++){
 
@@ -469,9 +470,9 @@
 				...
 			}
 			
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 			//look for loan in the loan list
-			int loanCount = loanBag.getSize(TABLE);
+			final int loanCount = loanBag.getSize(TABLE);
 
 			for(int i = 0; i < loanCount; i++){
 				
@@ -551,10 +552,10 @@
 	        }	        
 	    }
 		
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, 
 		protected static void printAdditionalServiceDocs(CBBag inBag, CBBag outBag) throws CBException
 	    {
-	        int asCount = inBag.getSize(SERVICEINFOS);	        
+	        final int asCount = inBag.getSize(SERVICEINFOS);	        
 	        
 	        CBBag docBag = CBBagFactory.createBag();
 
@@ -594,11 +595,11 @@
 				...
 
 
-			  String serviceName = inBag.get(SERVICEINFOS, i, SERVICENAME1).toString();
+		  String serviceName = inBag.get(SERVICEINFOS, i, SERVICENAME1).toString();
 	          String productCode = inBag.get(SERVICEINFOS, i, PRODUCTCODE).toString();
         			
 				
-			  outBag.put(SERVICELIST, j, -1, serviceName);
+		  outBag.put(SERVICELIST, j, -1, serviceName);
         	  outBag.put(SERVICELIST_NAME, j, -1, docBag.get(DOCUMENTID));
 	          j++;
 	        }
@@ -644,7 +645,7 @@
 				if(i == 9) { scoreBag.put(TABLE4, 0, RETURNCODE, code); scoreBag.put(TABLE4, 0, DATEINTERVAL, codeDate); }				
 			}
 			
-	//стало
+	//стало - не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 		   int codeIndex = 0;
 			...
 			
@@ -663,7 +664,7 @@
 			}
 			
 			codeMap = null;
-			int codeCount = codeIndex;	
+			final int codeCount = codeIndex;	
 
 			for(int i = 0; i < codeCount; i++){
 				
@@ -747,7 +748,7 @@
 		
 	}
 	
-	//стало
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
 	
 	private static CBBag getTodaysDistributedCreditsAccounts(CBBag inBag) throws CBException {
 		
@@ -755,7 +756,7 @@
 		
 		try {
 			//fill conversion table
-			int conversionCount = inBag.getSize(EXCHANGEINFO);
+			final int conversionCount = inBag.getSize(EXCHANGEINFO);
 			for (int i = 0; i < conversionCount; i++) {
 				
 				//conversion info
@@ -764,7 +765,7 @@
 			}
 			
 			//fill payment table
-			int paymentCount = inBag.getSize(PAYMENTINFORMATION);
+			final int paymentCount = inBag.getSize(PAYMENTINFORMATION);
 			for (int i = 0; i < paymentCount; i++) {
 				
 				//conversion info
