@@ -1,0 +1,44 @@
+
+//1. Переменная связывается во время написания кода - устанавливается дефолтное значение = 0, затем при выполнении кода, она может быть перезаписана
+
+	private static void updateCount(long parentOid) throws CBException {
+		...
+		int count = 0;
+		try{
+			pom.readByParentOid(parentOid);
+			while (pom.next()){
+				count++;
+			}
+			...
+			}
+		}
+		...
+		
+	}
+
+
+//2. Переменная связывается во время компиляции кода, устанавливается дефолтное значение CBCurrency.ZERO - константа класса CBCurrency, обозначающее 0 в определенном формате. Затем при выполнении кода, переменная может быть перезаписана
+
+private static CBBag prepareDocBagCallCenter(CBBag inBag, CBBag docBag) throws CBException{
+		...
+		CBCurrency valueBalance = CBCurrency.ZERO;
+		if(docBag.existsBagKey(TEXT1) && docBag.get(TEXT1)!=null && docBag.get(TEXT1).toString().length()>0)
+		{
+			valueBalance = docBag.get(TEXT1).toCBCurrency();
+		}
+    	String stringValuebalance = Utility.getCurrencyString(valueBalance, inBag.get(EXCHANGECODE).toString());  
+		...
+    	docBag.put(TEXT2, stringValuebalance);
+}
+
+
+//3. Переменная связывается во время выполнения. Данные заполняются из справочника в базе данных - по коду страны берется ее название
+
+	public static String getCountry(String countryCode) throws CBException
+	{
+		String countryName = Utils.getReferenceData(..., countryCode);
+		if (countryName == null)
+			return "";
+		else
+			return countryName;
+	}
