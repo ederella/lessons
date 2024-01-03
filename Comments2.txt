@@ -1,0 +1,127 @@
+//1 (3 - Проясение)
+	private static CBBag callBureau(CBBag reqBag)
+	{
+		CBBag ansBag = ...;
+		
+		ansBag.put(MESSAGE2, GZIPCompression.decompressString(ansBag.get(INPUTVALUE).toString())); //request
+		ansBag.put(RESULT2,  GZIPCompression.decompressString(ansBag.get(RETURNRESULT).toString())); //response
+		
+		return ansBag;
+	}
+	
+//2 (3 - Проясение)
+	...
+				docBag.put(DOKUMANDATA, dataBag);
+				docBag.put(DOCMEDIATYPE, "I"); //the document will be sent by email
+				docBag.put(DOCDESTINATION, emailAddress); //email address to which the document will be sent
+	...
+			
+//3 (1 - Информативные комментарии)
+		//for example: 8 (903) 550 77 77
+	    Pattern pattern = Pattern.compile("^(\\d{1,3})[( ](\\d{1,3})[) ](\\d{4,10})$");
+		
+//4 (1 - Информативные комментарии)
+		//for example: 480-953-512-08
+		Pattern pattern = Pattern.compile("^\\d{3}-\\d{3}-\\d{3} \\d{2}$");
+		Matcher matcher = pattern.matcher(SNILS.trim());
+		if(!matcher.matches())
+			throw new CBException(CustomerExceptions.EXC_SNILS_INCORRECT, null);
+		
+//5 (1 - Информативные комментарии)
+	public CBDate getParsedDate(String _key)
+	{
+		CBDate cbDate = null;
+		String date = _key;
+		//for example: 2022-02-22- 22:22:22.222
+		Pattern regex = Pattern.compile("(\\d{4})[-](\\d{2})[-](\\d{2})[- ](\\d{2})[:](\\d{2})[:](\\d{2})[.](\\d{3})");
+		Matcher m = regex.matcher(date);
+		if (m.find())
+		{
+			cbDate = CBDateFactory.newCBDate(m.group(1) + m.group(2) + m.group(3));
+		}
+		return cbDate;
+	}	
+//6 (3 - Проясение)
+	public static CBBag calculateIRRandNPV(CBBag inBag) throws CBException {
+		//Actually this method calculates PSK (not IRR!) by the formula from Federal Law 229-FZ
+		long paymentPlanOID = 0;
+		...
+	}
+//7 (2 - Представление намерений)
+	private static void requestLog(CBBag inBag, CBBag outBag) throws CBException
+	{
+		CBBag logBag = CBBagFactory.createBag();
+		try {
+			// log request
+			logBag.put(SERVICENAME, BEELINE_SERVICE);
+			logBag.put(CUSTOMEROID, inBag.get(CUSTOMEROID));
+			logBag.put(ID, inBag.existsBagKey(ID)? inBag.get(ID).toSimpleLong(): getQueryIDNumber("EXPQUERY"));//generate queryId just for logging
+		...
+		}
+//8 (2 - Представление намерений)
+	private static long getQueryIDNumber(String numPrefix) throws CBException{
+		CBBag numBag        = CBBagFactory.createBag();
+		String num = null;
+
+		try {
+			numBag.put(TIP, numPrefix);
+			numBag = CBCaller.call("NUMARA_GETIR",numBag);
+			num = numBag.get(NUMARA).toString();
+
+		} catch(CBException e) {
+			//if numerator can not be found, then create it
+			if(e.id == Constants.NUMERATOR_IS_NOT_FOUND) { 
+				createNewNumerator(numPrefix);
+				numBag.put(TIP, numPrefix);
+				numBag = CBCaller.call("NUMARA_GETIR",numBag);
+				num = numBag.get(NUMARA).toString();
+			}
+		}
+		return Long.parseLong(num);
+	}
+	
+//9  (2 - Представление намерений)
+				//put query id for adapter-side logging
+				inBag.put(ID, queryId);
+				inBag.put(OID, queryId);				
+				bureauBag = callAdapter(inBag);
+				
+				
+//10 (2 - Представление намерений)
+...
+	//get yesterday's sold/securitized retail loans and purchased agreements with portfolio reservation type
+	CBDate processDate = CBSystem.getInstance().getProcessDate().subtract(1);			 
+	if(inBag.existsBagKey(PROCESSDATE))
+			processDate = inBag.get(PROCESSDATE).toCBDate();
+	...
+	CBQueryExecuter rs1 = new CBQueryExecuter("INSERT_SOLD_CREDITS");
+	rs1.setParameter("DATE_N", processDate);
+	rs1.setParameter("DATE_P", processDate);
+	rs1.executeUpdate();
+	
+	
+//11 (2 - Представление намерений)
+	...
+			//get bookkeeped total amounts by portfolio for further bookkeeping
+			CBQueryExecuter rs2 = new CBQueryExecuter("SUM_BY_PORTFOLIO_SOLD");
+			rs2.executeUpdate();
+	...
+
+//12 (3 - Проясение)
+	private static CBCurrency getPortfolioRate(long portfolioOid) throws CBException {
+		...
+		try {
+			rs.setParameter("OVERDUECODE", 1);//means 0 days of overdue, assumed it will be recalculated in EOM by portfolio rate calculation batches
+			rs.setParameter("PORTFOLIOOID", portfolioOid);			
+			rs.executeQuery();
+
+			if (rs.next()) {
+				rate = rs.getCBCurrency("RATE");
+			}
+
+		} finally {
+			...
+		}
+		
+		return rate;
+	}
