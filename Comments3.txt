@@ -1,0 +1,666 @@
+//1
+//было (п.5 - gозиционные маркеры и п.12 - не используйте комментарии там, где можно использовать функцию или переменную)
+	public void finalAction(CBBag iBag) throws CBException 
+	{
+		CBBag tBag = CBBagFactory.createBag();
+		CBQueryExecuter qryExe = null;
+		StringBuffer stringBuffer = new StringBuffer();
+		try
+		{
+			// 
+			CBCaller.call("CRED_DELIVERYNOTES_CANCEL_OPERATIONS", iBag);
+			// --
+			qryExe = new CBQueryExecuter("CRED_LIST_CORP_CANCEL_TICKET_SAKS");
+			qryExe.setParameter("TRANSFERSTATUS1", "1");
+			qryExe.setParameter("DATE1", iBag.get(ACCOUNTINGDATE).toCBDate());
+			qryExe.setParameter("PRODUCTOPERATIONREFNO1", iBag.get(REFNO).toSimpleLong());
+			qryExe.setParameter("TRANSFERSTATUS2", "1");
+			qryExe.setParameter("DATE2", iBag.get(ACCOUNTINGDATE).toCBDate());
+			qryExe.setParameter("PRODUCTOPERATIONREFNO2", iBag.get(REFNO).toSimpleLong());
+			if (__DEBUG__) System.out.println(qryExe.getQueryString());
+			qryExe.executeQuery();
+			// delete from 5NT
+			for (; qryExe.next();)
+			{
+				long slipOID = qryExe.getLong("TICKETOID");
+				long _SAK = qryExe.getLong("TRANSFERID");
+				stringBuffer.setLength(0);
+				String _fileName = stringBuffer.append("d").append("_").append(_SAK).append("_").append(slipOID).append(".xml").toString();
+				tBag.clear();
+				tBag.put(FORMATCODE, "DELETEDOCUMENT");
+				tBag.put(SLIPOID, slipOID);
+				tBag.put(TRANSFERID, _SAK);
+				tBag.put(FILENAME, _fileName);
+				CBCaller.call("ACCT_TRANSFER_DELETE_DOCUMENT", tBag);
+			}
+		}
+		catch (CBException e)
+		{
+			e.printStackTrace();
+			throw e;
+		}
+		catch (Exception e)
+		{
+			CBBag exBag = CBBagFactory.createBag();
+			exBag.put(CALLER_SERVICE, "finalAction");
+			exBag.put(NOTE, e.getMessage());
+			throw new CBException(CBSMGExceptions.SYSTEM_ERROR, exBag);
+		}
+		finally
+		{
+			if (qryExe != null)
+				qryExe.close();
+		}
+	}
+//стало 
+public void finalAction(CBBag iBag) throws CBException 
+	{
+		CBCaller.call("CRED_DELIVERYNOTES_CANCEL_OPERATIONS", iBag);
+		List ticketBags = getTiketsToCancel(iBag);
+		deleteFrom5NT(ticketBags);
+		
+	}
+
+
+	private void deleteFrom5NT(List ticketBags) throws CBException {
+		for (Iterator iter = ticketBags.iterator(); iter.hasNext();) {
+			CBBag ticketBag = (CBBag) iter.next();
+			CBCaller.call("ACCT_TRANSFER_DELETE_DOCUMENT", ticketBag);
+		}
+	}
+
+
+	private List getTiketsToCancel(CBBag iBag) throws CBException {
+		List tikets = new ArrayList();
+		CBQueryExecuter qryExe = null;
+		StringBuffer stringBuffer = new StringBuffer();
+		try
+		{
+			qryExe = new CBQueryExecuter("CRED_LIST_CORP_CANCEL_TICKET_SAKS");
+			qryExe.setParameter("TRANSFERSTATUS1", "1");
+			qryExe.setParameter("DATE1", iBag.get(ACCOUNTINGDATE).toCBDate());
+			qryExe.setParameter("PRODUCTOPERATIONREFNO1", iBag.get(REFNO).toSimpleLong());
+			qryExe.setParameter("TRANSFERSTATUS2", "1");
+			qryExe.setParameter("DATE2", iBag.get(ACCOUNTINGDATE).toCBDate());
+			qryExe.setParameter("PRODUCTOPERATIONREFNO2", iBag.get(REFNO).toSimpleLong());
+			if (__DEBUG__) 
+				System.out.println(qryExe.getQueryString());
+			qryExe.executeQuery();
+
+			while ( qryExe.next())
+			{
+				long slipOID = qryExe.getLong("TICKETOID");
+				long _SAK = qryExe.getLong("TRANSFERID");
+				stringBuffer.setLength(0);
+				String _fileName = stringBuffer.append("d").append("_").append(_SAK).append("_").append(slipOID).append(".xml").toString();
+				CBBag ticketBag = CBBagFactory.createBag();
+				ticketBag.put(FORMATCODE, "DELETEDOCUMENT");
+				ticketBag.put(SLIPOID, slipOID);
+				ticketBag.put(TRANSFERID, _SAK);
+				ticketBag.put(FILENAME, _fileName);
+				tikets.add(ticketBag);
+			}
+		}
+		finally
+		{
+			if (qryExe != null)
+				qryExe.close();
+		}
+		return tikets;
+	}
+	
+//2
+//было (п.11 закоментированный код)
+	public int kontroleGonder(CBBag iBag) throws CBException
+	{
+		CBBag outBag = CBBagFactory.createBag();
+		CBCurrency totalCommission = CBCurrency.ZERO;
+		CBCurrency totalpayment = CBCurrency.ZERO;
+		CBCurrency accountBalance = CBCurrency.ZERO;
+		String accountNR = "";
+		String collectionType="";
+		if (iBag.getSize(COMMISSION) > 0)
+		{
+			totalCommission = iBag.get(COMMISSION, iBag.getSize(COMMISSION) - 1, COMMISSIONAMOUNT).toCBCurrency();
+		}
+		totalpayment = iBag.get(PAYMENT, 0, PAIDAMOUNT).toCBCurrency();
+		for (int i = 0; i < iBag.getSize(ACCOUNT); i++)
+		{
+			accountNR = iBag.get(ACCOUNT, i, ACCOUNTNR).toString();
+			if (accountNR.substring(0, 5).equalsIgnoreCase("47401"))
+			{
+				accountBalance = iBag.get(ACCOUNT, i, BALANCE).toCBCurrency();
+				break;
+			}
+		}
+		/*
+		if (totalCommission.add(totalpayment).compare(accountBalance) > 0)
+		{
+			outBag.put(ACCOUNTNR, accountNR);
+			throw new CBException(40432, outBag);
+		}
+		
+		//--
+		totalpayment = CBCurrency.ZERO;
+		for (int i = 0; i < iBag.getSize(TABLE3); i++)
+		{
+			collectionType = iBag.get(TABLE3, i, COLLECTIONTYPE).toString();
+			if (collectionType.equalsIgnoreCase("TC") && iBag.get(TABLE3, i, PAIDAMOUNT).toCBCurrency().compare(CBCurrency.ZERO) > 0)
+			{
+				for (int j = 0; j < iBag.getSize(TABLE3); j++)
+				{
+					if (iBag.get(TABLE3, i, CUSTOMER1OID).toSimpleLong() == iBag.get(TABLE3, j, CUSTOMER1OID).toSimpleLong())
+					{
+						if (!iBag.get(TABLE3, j, COLLECTIONTYPE).toString().equalsIgnoreCase("TC"))
+						{
+							totalpayment = totalpayment.add(iBag.get(TABLE3, j, AMOUNT5).toCBCurrency().subtract(iBag.get(TABLE3, j, PAIDAMOUNT).toCBCurrency()));
+						}
+					}
+				}
+				if (totalpayment.compare(CBCurrency.ZERO) > 0)
+				{
+					outBag.put(DEBTOR, iBag.get(TABLE3, i, DEBTOR));
+					throw new CBException(40589, outBag);
+				}
+			}
+		}
+		*/
+		
+		
+		
+		return KONTROLDENGECTI;
+	}
+//стало 
+public int kontroleGonder(CBBag iBag) throws CBException
+	{
+		CBBag outBag = CBBagFactory.createBag();
+		CBCurrency totalCommission = CBCurrency.ZERO;
+		CBCurrency totalpayment = CBCurrency.ZERO;
+		CBCurrency accountBalance = CBCurrency.ZERO;
+		String accountNR = "";
+		String collectionType="";
+		if (iBag.getSize(COMMISSION) > 0)
+		{
+			totalCommission = iBag.get(COMMISSION, iBag.getSize(COMMISSION) - 1, COMMISSIONAMOUNT).toCBCurrency();
+		}
+		totalpayment = iBag.get(PAYMENT, 0, PAIDAMOUNT).toCBCurrency();
+		for (int i = 0; i < iBag.getSize(ACCOUNT); i++)
+		{
+			accountNR = iBag.get(ACCOUNT, i, ACCOUNTNR).toString();
+			if (accountNR.substring(0, 5).equalsIgnoreCase("47401"))
+			{
+				accountBalance = iBag.get(ACCOUNT, i, BALANCE).toCBCurrency();
+				break;
+			}
+		}
+		
+		return KONTROLDENGECTI;
+	}
+//3
+//было (п.4 - шум)
+		CBCurrency agreementAmount 	= iBag.get(AGREEMENTAMOUNT).toCBCurrency();
+		CBCurrency limitAmount 		= iBag.get(LIMITSUM).toCBCurrency();
+		
+		long newCustomerOid 		= iBag.get(CUSTOMEROID).toSimpleLong();
+		long oldCustomerOid 		= iBag.get(CUSTOMER1OID).toSimpleLong();
+		
+		//agreement amount greater than customer limit
+		if (agreementAmount.compareTo(limitAmount) > 0)
+			throw new CBException(41072, null);
+		
+		//new and old customers are the same
+		if (newCustomerOid == oldCustomerOid)
+			throw new CBException(41074, null);
+//стало
+
+		CBCurrency agreementAmount 	= iBag.get(AGREEMENTAMOUNT).toCBCurrency();
+		CBCurrency limitAmount 		= iBag.get(LIMITSUM).toCBCurrency();
+		
+		long newCustomerOid 		= iBag.get(CUSTOMEROID).toSimpleLong();
+		long oldCustomerOid 		= iBag.get(CUSTOMER1OID).toSimpleLong();
+
+		if (agreementAmount.compareTo(limitAmount) > 0)
+			throw new CBException(INCORRECT_CAF, null);
+
+		if (newCustomerOid == oldCustomerOid)
+			throw new CBException(INCORRECT_CAF, null);
+		
+//4
+//было (п.4 - шум)
+								//calculate amount to be paid
+								paidDebt = remainingBalance.min(remainingDebt);						
+								//calculate new remainigDebt
+								remainingDebt = remainingDebt.subtract(paidDebt);	
+								remainingDebt = remainingDebt.compare(CBCurrency.ZERO) < 0 ? CBCurrency.ZERO : remainingDebt;
+								//calculate remaining balance
+								remainingBalance = remainingBalance.subtract(paidDebt);
+								remainingBalance = remainingBalance.compare(CBCurrency.ZERO) < 0 ? CBCurrency.ZERO : remainingBalance;
+								//decrement totalremainingdebt
+								totalRemainingDebt = totalRemainingDebt.subtract(paidDebt);
+
+								//change values in account bag
+								accountBag.put(TABLE, j, ACCOUNTAMOUNT, paidDebt.add(accountBag.get(TABLE, j, ACCOUNTAMOUNT).toCBCurrency()));
+								accountBag.put(TABLE, j, REMAININGAMOUNT, remainingBalance);	
+
+								//change values in loan bag
+								loanBag.put(TABLE, i, ACCOUNTAMOUNT, paidDebt.add(loanBag.get(TABLE, i, ACCOUNTAMOUNT).toCBCurrency()));
+								loanBag.put(TABLE, i, REMAININGAMOUNT, remainingDebt);
+//стало
+								
+								paidDebt = remainingBalance.min(remainingDebt);						
+
+								remainingDebt = remainingDebt.compare(paidDebt) < 0 ? CBCurrency.ZERO : remainingDebt.subtract(paidDebt);
+
+								remainingBalance = remainingBalance.compare(paidDebt) < 0 ? CBCurrency.ZERO : remainingBalance.subtract(paidDebt);
+
+								totalRemainingDebt = totalRemainingDebt.subtract(paidDebt);
+
+								accountBag.put(TABLE, j, ACCOUNTAMOUNT, paidDebt.add(accountBag.get(TABLE, j, ACCOUNTAMOUNT).toCBCurrency()));
+								accountBag.put(TABLE, j, REMAININGAMOUNT, remainingBalance);	
+
+								loanBag.put(TABLE, i, ACCOUNTAMOUNT, paidDebt.add(loanBag.get(TABLE, i, ACCOUNTAMOUNT).toCBCurrency()));
+								loanBag.put(TABLE, i, REMAININGAMOUNT, remainingDebt);
+
+//5
+//было (п.4 - шум)
+			for(int i = 0; i<loanCount; i++)
+			{ 
+				//get debt brief information
+				remainingDebt = loanBag.get(TABLE, i, REMAININGAMOUNT).toCBCurrency();				
+				debtExchangeCode = loanBag.get(TABLE, i, EXCHANGECODE).toString();
+				
+				//if there is positive remaining debt than look for balances 
+				if(remainingDebt.compare(CBCurrency.ZERO) > 0)
+				{
+					//increment totalRemaining Debt
+					totalRemainingDebt = totalRemainingDebt.add(remainingDebt);
+
+					for(int j=0; j<accountCount;j++)
+					{	
+						//get account exchange code
+						accountExchangeCode = accountBag.get(TABLE, j, EXCHANGECODE).toString();
+						//get remaining balance of account
+						remainingBalance = accountBag.get(TABLE, j, REMAININGAMOUNT).toCBCurrency();
+						//if theer is some remaining balance
+						if(remainingBalance.compare(CBCurrency.ZERO) > 0)
+						{
+							//make exchange operation
+							CBBag fxBag = makeExchangeOperation(exchangeRates, debtExchangeCode, accountExchangeCode, remainingDebt, remainingBalance);
+
+							//if fx operation was unsucessfull go to next account
+							if(fxBag == null) continue;
+
+							//get amount to be paid and balance used
+							paidDebt = fxBag.get(CREDITAMOUNT).toCBCurrency();					
+							balanceUsed = fxBag.get(DEBITAMOUNT_).toCBCurrency();
+							
+							//calculate new remainigDebt
+							remainingDebt = remainingDebt.subtract(paidDebt);	
+							remainingDebt = remainingDebt.compare(CBCurrency.ZERO) < 0 ? CBCurrency.ZERO : remainingDebt;
+							
+							//calculate remaining balance
+							remainingBalance = remainingBalance.subtract(balanceUsed);
+							remainingBalance = remainingBalance.compare(CBCurrency.ZERO) < 0 ? CBCurrency.ZERO : remainingBalance;
+							
+							//decrement totalremainingdebt
+							totalRemainingDebt = totalRemainingDebt.subtract(paidDebt);
+
+							//change values in account bag
+							accountBag.put(TABLE, j, ACCOUNTAMOUNT, balanceUsed.add(accountBag.get(TABLE, j, ACCOUNTAMOUNT).toCBCurrency()));
+							accountBag.put(TABLE, j, REMAININGAMOUNT, remainingBalance);	
+
+							//change values in loan bag
+							loanBag.put(TABLE, i, ACCOUNTAMOUNT, paidDebt.add(loanBag.get(TABLE, i, ACCOUNTAMOUNT).toCBCurrency()));
+							loanBag.put(TABLE, i, REMAININGAMOUNT, remainingDebt);	
+
+							//break interation if current debt is paid whole
+							if(remainingDebt.compare(CBCurrency.ZERO) <= 0)
+								break;
+						}
+					}		
+				}
+			}
+//стало
+for(int i = 0; i<loanCount; i++)
+			{ 
+				remainingDebt = loanBag.get(TABLE, i, REMAININGAMOUNT).toCBCurrency();				
+				debtExchangeCode = loanBag.get(TABLE, i, EXCHANGECODE).toString();
+
+				if(remainingDebt.compare(CBCurrency.ZERO) > 0)
+				{
+					totalRemainingDebt = totalRemainingDebt.add(remainingDebt);
+
+					for(int j=0; j<accountCount;j++)
+					{	
+						
+						accountExchangeCode = accountBag.get(TABLE, j, EXCHANGECODE).toString();
+						
+						remainingBalance = accountBag.get(TABLE, j, REMAININGAMOUNT).toCBCurrency();
+						
+						if(remainingBalance.compare(CBCurrency.ZERO) > 0)
+						{
+
+							CBBag fxBag = makeExchangeOperation(exchangeRates, debtExchangeCode, accountExchangeCode, remainingDebt, remainingBalance);
+
+							if(fxBag == null) 
+								continue;
+
+							paidDebt = fxBag.get(CREDITAMOUNT).toCBCurrency();					
+							balanceUsed = fxBag.get(DEBITAMOUNT_).toCBCurrency();
+
+							remainingDebt = remainingDebt.compare(paidDebt) < 0 ? CBCurrency.ZERO : remainingDebt.subtract(paidDebt);
+
+							remainingBalance = remainingBalance.compare(balanceUsed) < 0 ? CBCurrency.ZERO : remainingBalance.subtract(balanceUsed);
+
+							totalRemainingDebt = totalRemainingDebt.subtract(paidDebt);
+
+							accountBag.put(TABLE, j, ACCOUNTAMOUNT, balanceUsed.add(accountBag.get(TABLE, j, ACCOUNTAMOUNT).toCBCurrency()));
+							accountBag.put(TABLE, j, REMAININGAMOUNT, remainingBalance);	
+
+							loanBag.put(TABLE, i, ACCOUNTAMOUNT, paidDebt.add(loanBag.get(TABLE, i, ACCOUNTAMOUNT).toCBCurrency()));
+							loanBag.put(TABLE, i, REMAININGAMOUNT, remainingDebt);	
+
+							if(remainingDebt.compare(CBCurrency.ZERO) <= 0)
+								break;
+						}
+					}		
+				}
+			}
+			
+//6
+//было (п.11 закоментированный код)
+try 
+		{	
+			inBag.copyTo(callBag);
+			if(SYSTEM_PARTNERID.matches(BIN_CEB)){						
+				callBag.put(TARGET, PARTNER_ONEY);
+			}else if(SYSTEM_PARTNERID.matches(BIN_ONEY)){
+				callBag.put(TARGET, PARTNER_CEB);
+			}	
+			...				
+			
+		} catch (CBException e) {			
+			//callBag.put(ERR, e.getMessage());
+			//return callBag;
+			throw e;
+		}
+//стало
+
+			inBag.copyTo(callBag);
+			if(SYSTEM_PARTNERID.matches(BIN_CEB)){						
+				callBag.put(TARGET, PARTNER_ONEY);
+			}else if(SYSTEM_PARTNERID.matches(BIN_ONEY)){
+				callBag.put(TARGET, PARTNER_CEB);
+			}	
+			...
+			
+//7
+//было (п.4 - шум)
+			//set query parameters
+			rs = new CBQueryExecuter("CRED_BNKRPT_LIST_BATCH_RUNS");
+			rs.setParameter("STARTDATE", CBSystem.getInstance().getProcessDate());
+		
+			//execute query
+			rs.executeQuery();
+			//fill table
+			for(int i =0; rs.next() ; i++) 
+			{				
+				outBag.put(TABLENAME, i, JOBID, 		rs.getString("SJOBID"));
+				outBag.put(TABLENAME, i, JOBNAME, 		rs.getString("SJOBNAME"));
+				...
+			}
+//стало
+
+			rs = new CBQueryExecuter("CRED_BNKRPT_LIST_BATCH_RUNS");
+			rs.setParameter("STARTDATE", CBSystem.getInstance().getProcessDate());
+
+			rs.executeQuery();
+
+			for(int i =0; rs.next() ; i++) 
+			{				
+				outBag.put(TABLENAME, i, JOBID, 		rs.getString("SJOBID"));
+				outBag.put(TABLENAME, i, JOBNAME, 		rs.getString("SJOBNAME"));
+			...
+			}
+//8
+//было (п.11 закоментированный код)
+		depBag.put(PO_PRODUCTREFNO, accBag.get(PRODUCTREFNO));
+		depBag.put(ACCOUNTEXCHANGECODE, accBag.get(EXCHANGECODE));
+		depBag.put(ACCOUNTBRANCHCODE, accBag.get(BRANCHCODE));
+		depBag.put(SCREENCODE, "NEW_ACCOUNTING");
+		//depBag.put(POWEROFATTORNEY, arg1);
+		depBag.put(PASSPORTID, custBag.get(PASSPORTID));
+		//depBag.put(SELECT, arg1);
+		//depBag.put(OPERATIONMAKERTITLE, inBag.get(CUSTOMEROID));
+		//depBag.put(TITLENAME, arg1);
+		//depBag.put(ACTIVEFLAG, arg1);
+		depBag.put(TEMPOCASH, 0);
+		
+//стало
+		depBag.put(PO_PRODUCTREFNO, accBag.get(PRODUCTREFNO));
+		depBag.put(ACCOUNTEXCHANGECODE, accBag.get(EXCHANGECODE));
+		depBag.put(ACCOUNTBRANCHCODE, accBag.get(BRANCHCODE));
+		depBag.put(SCREENCODE, "NEW_ACCOUNTING");
+		depBag.put(PASSPORTID, custBag.get(PASSPORTID));
+		depBag.put(TEMPOCASH, 0);
+//9
+//было (п.12 - не используйте комментарии там, где можно использовать функцию или переменную)
+			//set today for overdraft maturity date
+			CBDate overdraftMaturity = CBSystem.getInstance().getDate();
+			//set today for cash loan installment date 
+			CBDate cashInstallment = CBSystem.getInstance().getDate();
+//стало
+			CBDate overdraftMaturityDate = CBSystem.getInstance().getDate();
+			CBDate cashInstallmentDate = CBSystem.getInstance().getDate();
+			
+//10
+//было (п.5 - позиционные маркеры)
+		short riskGroup = inBag.get(RISKTYPE).toSimpleShort();
+		CBCurrency amount = CBCurrency.ZERO;
+		// --
+		makeSaleAmountBookkeeping(inBag);
+		makePenaltySaleBookkeeping(inBag);
+		makeStateDutyAccounting(inBag);
+		makeTotalMinusSaleAmountBookkeeping(inBag);
+		// --
+		amount = inBag.get(PENINTCOLLECTED).toCBCurrency().add(inBag.get(PENPRINCOLLECTED).toCBCurrency());
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make penalty bookkeeping
+			debit_612_credit_701(inBag, amount, MFSE_CUSTOMER, MFSE_COMMISSION);
+		}
+		// --
+		loanSaleInterestOnOverdueBookkeeping(inBag);
+		loanSaleOverdueInterestBookkeeping(inBag);
+		loanSaleNormalInterestBookkeeping(inBag);
+		// --
+		amount = inBag.get(PRINCIPLECOLLECTED).toCBCurrency();
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make overdue principle bookkeeping
+			debit_612_credit_customer(inBag, amount, inBag.get(OVERDUELOANACCOUNTOID).toSimpleLong(), MFSE_TAKEN, MFSE_DELAYEDPRINCIPAL, 416);
+		}
+		// --
+		amount = inBag.get(CAPITALTOBESUBTRACTED).toCBCurrency();
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make normal principal bookkeeping
+			debit_612_credit_customer(inBag, amount, inBag.get(LOANACCOUNTOID).toSimpleLong(), MFSE_DEPOSITACCOUNT, MFSE_LOAN_ACCOUNT_PRINCIPAL, 417);
+		}
+//стало
+		short riskGroup = inBag.get(RISKTYPE).toSimpleShort();
+		CBCurrency amount = CBCurrency.ZERO;
+
+		makeSaleAmountBookkeeping(inBag);
+		makePenaltySaleBookkeeping(inBag);
+		makeStateDutyAccounting(inBag);
+		makeTotalMinusSaleAmountBookkeeping(inBag);
+
+		amount = inBag.get(PENINTCOLLECTED).toCBCurrency().add(inBag.get(PENPRINCOLLECTED).toCBCurrency());
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make penalty bookkeeping
+			debit_612_credit_701(inBag, amount, MFSE_CUSTOMER, MFSE_COMMISSION);
+		}
+
+		loanSaleInterestOnOverdueBookkeeping(inBag);
+		loanSaleOverdueInterestBookkeeping(inBag);
+		loanSaleNormalInterestBookkeeping(inBag);
+
+		amount = inBag.get(PRINCIPLECOLLECTED).toCBCurrency();
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make overdue principle bookkeeping
+			debit_612_credit_customer(inBag, amount, inBag.get(OVERDUELOANACCOUNTOID).toSimpleLong(), MFSE_TAKEN, MFSE_DELAYEDPRINCIPAL, 416);
+		}
+
+		amount = inBag.get(CAPITALTOBESUBTRACTED).toCBCurrency();
+		if (Utility.isGreaterThanZero(amount))
+		{
+			// make normal principal bookkeeping
+			debit_612_credit_customer(inBag, amount, inBag.get(LOANACCOUNTOID).toSimpleLong(), MFSE_DEPOSITACCOUNT, MFSE_LOAN_ACCOUNT_PRINCIPAL, 417);
+		}
+//11
+//было (п.4 - шум, п.5 - позиционные маркеры)
+			CashLoanServicesHelper.issuanceAccounting(inBag, outBag);
+			// 
+			AccountingOperations.loanPurchaseAccounting(inBag, outBag.get(CUSTOMERTYPE1).toString());
+			//--
+			inBag.put(OPERATIONTYPE, "A");
+			saleInfoOperations(inBag);
+			// add provision
+			Provision.addProvision(inBag, pomData.loanAmount, CorporateLoanConstants.CASH_LOAN_PROVISON_TYPE);
+//стало
+			CashLoanServicesHelper.issuanceAccounting(inBag, outBag);			
+			AccountingOperations.loanPurchaseAccounting(inBag, outBag.get(CUSTOMERTYPE1).toString());			
+			inBag.put(OPERATIONTYPE, "A");
+			saleInfoOperations(inBag);			
+			Provision.addProvision(inBag, pomData.loanAmount, CorporateLoanConstants.CASH_LOAN_PROVISON_TYPE);
+//12
+//было (п.1 - неочевидные комментарии, п.11 - закоментированный код)
+		if (inBag.get(EXCHANGECODE).toString().equalsIgnoreCase(inBag.get(EXCHANGE).toString())) {
+				if (accountBalance.compare(totalAmount) < 0) {
+					outBag.put(HESAPNO, inBag.get(ACCOUNTNR));
+					//		throw new CBException(CorporateLoanInformations.ACCOUNT_BALANCE_ISNOT_ENOUGH, outBag);
+					// Burdaki kontroller ekrandan yapildi. Daha sonra istege gore duzenlenebilir
+				}
+			} 
+//стало
+		if (inBag.get(EXCHANGECODE).toString().equalsIgnoreCase(inBag.get(EXCHANGE).toString())) {
+				if (accountBalance.compare(totalAmount) < 0) {
+					outBag.put(HESAPNO, inBag.get(ACCOUNTNR));
+				}
+			} 
+			
+//13
+//было (п.4 - шум)
+	try {
+			// get loan accounts
+			LoanAccount.getLoanAccounts(inBag).copyTo(inBag);
+			// get cash loan master information
+			CBBag cashBag = CorporateCashLoan.getCashLoanMasterInformation(inBag);
+			// put necessary information to bag
+			inBag.put(CREDITREFERRENCE, cashBag.get(CREDITREFERRENCE));
+			inBag.put(CUSTOMEROID, cashBag.get(CUSTOMEROID));
+			inBag.put(EXCHANGERATE, Utility.getExchangeRate(inBag.get(EXCHANGECODE).toString()));
+			// get risk group type
+			inBag.put(RISKTYPE, Utility.getRiskGroupInfo(inBag.get(AGREEMENTOID).toSimpleLong()).get(RISKTYPE).toString());
+			// get child information
+			CorporateCashLoan childClass = Utility.getChildClassName(cashBag.get(ACTIONOID).toSimpleLong());
+			// modify installment as overdue
+			childClass.modifyAsOverdue(inBag).copyTo(inBag);			
+			// make accounting operations
+			AccountingOperations.makeOverdue(inBag);
+			// Arrange overdue provision, transfer amounts directly
+			Provision.transferOverdueProvision(inBag);
+			...
+	}
+//стало
+	try {
+			LoanAccount.getLoanAccounts(inBag).copyTo(inBag);
+			CBBag cashBag = CorporateCashLoan.getCashLoanMasterInformation(inBag);
+
+			inBag.put(CREDITREFERRENCE, cashBag.get(CREDITREFERRENCE));
+			inBag.put(CUSTOMEROID, cashBag.get(CUSTOMEROID));
+			inBag.put(EXCHANGERATE, Utility.getExchangeRate(inBag.get(EXCHANGECODE).toString()));
+			inBag.put(RISKTYPE, Utility.getRiskGroupInfo(inBag.get(AGREEMENTOID).toSimpleLong()).get(RISKTYPE).toString());
+
+			CorporateCashLoan childClass = Utility.getChildClassName(cashBag.get(ACTIONOID).toSimpleLong());
+			childClass.modifyAsOverdue(inBag).copyTo(inBag);			
+			AccountingOperations.makeOverdue(inBag);
+			Provision.transferOverdueProvision(inBag);
+			...
+	}
+	
+//14
+//было	(п.4 - шум)
+			...
+			creditOID = inBag.get(REFERENCEOID).toSimpleLong();
+			// put necessary information to inBag
+			inBag.put(CREDITOID, creditOID);
+			// get master cash loan information
+			CBBag cashBag = CorporateCashLoan.getCashLoanMasterInformation(inBag);
+			// get rate and coefficient information
+			CBCurrency coefficient = inBag.get(OPERATORCOEFFICIENT).toCBCurrency();
+			CBCurrency rate = inBag.get(RATE).toCBCurrency();
+			// get loan accountoid of credit
+			long loanAccountOID = LoanAccount.getLoanAccounts(inBag).get(LOANACCOUNTOID).toSimpleLong();
+			tempBag = Provision.calculateProvisionAmount(cashBag.get(EXCHANGECODE).toString(), Utility.getAccountBalance(loanAccountOID), rate, coefficient);
+			...
+//стало
+			...
+			creditOID = inBag.get(REFERENCEOID).toSimpleLong();
+			inBag.put(CREDITOID, creditOID);
+
+			CBBag cashBag = CorporateCashLoan.getCashLoanMasterInformation(inBag);
+			String exchCode = cashBag.get(EXCHANGECODE).toString();
+			CBCurrency coefficient = inBag.get(OPERATORCOEFFICIENT).toCBCurrency();
+			CBCurrency rate = inBag.get(RATE).toCBCurrency();
+			long loanAccountOID = LoanAccount.getLoanAccounts(inBag).get(LOANACCOUNTOID).toSimpleLong();
+			CBCurrency loanAccountBalance = Utility.getAccountBalance(loanAccountOID);
+			tempBag = Provision.calculateProvisionAmount(exchCode, loanAccountBalance, rate, coefficient);
+			...
+//15
+//было (п.11 закоментированный код)
+			...
+    		scoreBag.put(INNFLAG, 0);
+    		String fio = customerbag.get(CUSTOMERNAME).toString().toLowerCase();
+    		qe1 = new CBQueryExecuter("CRED_SEARCH_CUSTOMER_BANKRUPT");
+    		qe1.setParameter("CUSTOMEROID", customeroid);
+    		qe1.setParameter("BIRTHDATE", customerbag.get(BIRTHDATE).toCBDate());
+    		qe1.setParameter("FIO", fio);
+    		qe1.setParameter("OLDFIO", "%"+fio+"%");
+    		/*if(customerbag.existsBagKey(PREVIOUSSURNAME) && customerbag.get(PREVIOUSSURNAME)!=null && customerbag.get(PREVIOUSSURNAME).toString().trim().length()>0){
+    			String pfio = customerbag.get(PREVIOUSSURNAME).toString().trim();
+    			pfio += " "+customerbag.get(NAMEA).toString();
+    			pfio += " "+customerbag.get(SECONDNAME).toString();
+    			qe1.setParameter("OLDFIO", "%"+pfio.trim().toLowerCase()+"%");
+    		}*/
+    		if(customerbag.existsBagKey(TAXNO) && customerbag.get(TAXNO)!=null)
+    		{
+    			String inn = customerbag.get(TAXNO).toString().trim();
+    			if(inn.length()>0 && !inn.matches("0++"))
+    			{
+    				qe1.setParameter("INN", customerbag.get(TAXNO).toString());
+    			}
+    		}
+    		...
+//стало
+			...
+    		scoreBag.put(INNFLAG, 0);
+    		String fio = customerbag.get(CUSTOMERNAME).toString().toLowerCase();
+    		qe1 = new CBQueryExecuter("CRED_SEARCH_CUSTOMER_BANKRUPT");
+    		qe1.setParameter("CUSTOMEROID", customeroid);
+    		qe1.setParameter("BIRTHDATE", customerbag.get(BIRTHDATE).toCBDate());
+    		qe1.setParameter("FIO", fio);
+    		qe1.setParameter("OLDFIO", "%"+fio+"%");
+
+    		if(customerbag.existsBagKey(TAXNO) && customerbag.get(TAXNO)!=null)
+    		{
+    			String inn = customerbag.get(TAXNO).toString().trim();
+    			if(inn.length()>0 && !inn.matches("0++"))
+    			{
+    				qe1.setParameter("INN", customerbag.get(TAXNO).toString());
+    			}
+    		}
+    		...
