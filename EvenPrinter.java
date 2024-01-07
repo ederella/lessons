@@ -8,19 +8,17 @@ public class EvenPrinter {
 
 		LinkedList<Integer> list = new LinkedList<Integer>();
 
-		for (int i = 0; i < 20; i++) {
+		for (int i = -20; i < 20; i++) {
 			list.add(i);
 		}
 
-		System.out.println(printEven(list));
+		System.out.println(printEven(list, 0));
 	}
 
-	private static String printEven(LinkedList<Integer> list) {
-		if (list.isEmpty())
+	private static String printEven(LinkedList<Integer> list, int startPosition) {
+		if (list.size() == startPosition)
 			return "";
-		Integer firstElement = list.pop();
-
-		return getEven(firstElement) + printEven(list);
+		return getEven(list.get(startPosition)) + printEven(list, startPosition + 1);
 	}
 
 	private static String getEven(Integer number) {
