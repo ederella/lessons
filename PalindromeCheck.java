@@ -25,7 +25,8 @@ public class PalindromeCheck {
 	private static boolean isPalindrome(String string, int startPosition) {
 		if (string.length() / 2 <= startPosition)
 			return true;
-		return string.charAt(startPosition) == string.charAt(string.length() - 1 - startPosition)
-				&& isPalindrome(string, startPosition + 1);
+		if(string.charAt(startPosition) != string.charAt(string.length() - 1 - startPosition))
+			return false;
+		return isPalindrome(string, startPosition + 1);
 	}
 }
