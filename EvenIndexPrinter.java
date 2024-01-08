@@ -16,7 +16,7 @@ public class EvenIndexPrinter {
 		printEvenIndex(list);
 	}
 
-	private static void printEvenIndex(List<Integer> list) {
+	public static void printEvenIndex(List<Integer> list) {
 		printEvenIndex(list, 0);
 	}
 
