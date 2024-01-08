@@ -1,12 +1,13 @@
 package recursion;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EvenPrinter {
 
 	public static void main(String... strings) {
 
-		LinkedList<Integer> list = new LinkedList<Integer>();
+		List<Integer> list = new ArrayList<Integer>();
 
 		for (int i = -20; i < 20; i++) {
 			list.add(i);
@@ -15,7 +16,7 @@ public class EvenPrinter {
 		System.out.println(printEven(list, 0));
 	}
 
-	private static String printEven(LinkedList<Integer> list, int startPosition) {
+	private static String printEven(List<Integer> list, int startPosition) {
 		if (list.size() == startPosition)
 			return "";
 		return getEven(list.get(startPosition)) + printEven(list, startPosition + 1);
