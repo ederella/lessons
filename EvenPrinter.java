@@ -19,14 +19,9 @@ public class EvenPrinter {
 		if (list.size() == startPosition)
 			return;
 		
-		if(isEven(list.get(startPosition))) {
+		if(list.get(startPosition) % 2 == 0) {
 			System.out.println(list.get(startPosition));
 		}				
 		printEven(list, startPosition + 1);
 	}
-
-	private static boolean isEven(Integer number) {
-		return (number.intValue() & 1) == 0;
-	}
-
 }
