@@ -13,15 +13,15 @@ public class EvenIndexPrinter {
 			list.add(i);
 		}
 
-		printEvenIndex(list, 0, true);
+		printEvenIndex(list, 0);
 	}
 
-	private static void printEvenIndex(List<Integer> list, int startPosition, boolean isEven) {
-		if (list.size() == startPosition)
+	private static void printEvenIndex(List<Integer> list, int startPosition) {
+		if (list.size() <= startPosition)
 			return;
-		if(isEven) {
-			System.out.println(list.get(startPosition) + " index " + startPosition);
-		}
-		printEvenIndex(list, startPosition + 1, !isEven);
+
+		System.out.println(list.get(startPosition) + " index " + startPosition);
+
+		printEvenIndex(list, startPosition + 2);
 	}
 }
