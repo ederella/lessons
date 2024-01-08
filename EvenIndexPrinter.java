@@ -13,6 +13,10 @@ public class EvenIndexPrinter {
 			list.add(i);
 		}
 
+		printEvenIndex(list);
+	}
+
+	private static void printEvenIndex(List<Integer> list) {
 		printEvenIndex(list, 0);
 	}
 
