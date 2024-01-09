@@ -31,14 +31,14 @@ public class SecondMax {
 		Max max = new Max();
 		max.add(list.get(0));
 		max.add(list.get(1));
-		return getSecondMax(list.subList(2, list.size()), max);
+		return getSecondMax(list, 2, max);
 	}
 	
-	private static int getSecondMax(List<Integer> list, Max max) {
-		if(list.isEmpty())
+	private static int getSecondMax(List<Integer> list, int startPosition, Max max) {
+		if(list.size() <= startPosition)
 			return max.getSecondMax();
-		max.add(list.get(0));
-		return getSecondMax(list.subList(1, list.size()), max);
+		max.add(list.get(startPosition));
+		return getSecondMax(list, startPosition + 1, max);
 	}
 }
 class Max{
