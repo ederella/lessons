@@ -28,34 +28,22 @@ public class SecondMax {
 	}
 
 	private static int getSecondMax(List<Integer> list) {
-		Max max = new Max();
-		max.add(list.get(0));
-		max.add(list.get(1));
-		return getSecondMax(list, 2, max);
-	}
-	
-	private static int getSecondMax(List<Integer> list, int startPosition, Max max) {
-		if(list.size() <= startPosition)
-			return max.getSecondMax();
-		max.add(list.get(startPosition));
-		return getSecondMax(list, startPosition + 1, max);
-	}
-}
-class Max{
-	private int firstMax = Integer.MIN_VALUE;
-	private int secondMax = Integer.MIN_VALUE;
-	
-	void add(int newMax) {
-		if(newMax >= firstMax) {
-			secondMax = firstMax;
-			firstMax = newMax;
-		}
-		if(newMax < firstMax && newMax > secondMax) {
-			secondMax = newMax;
-		}
-	}
 
-	int getSecondMax() {
-		return secondMax;
+		return getSecondMax(list, 0, Integer.MIN_VALUE, Integer.MIN_VALUE);
+	}
+	
+	private static int getSecondMax(List<Integer> list, int startPosition, int firstMax, int secondMax) {
+		if(list.size() <= startPosition)
+			return secondMax;
+		
+		if(list.get(startPosition) >= firstMax) {
+			secondMax = firstMax;
+			firstMax = list.get(startPosition);
+		}
+		if(list.get(startPosition) < firstMax && list.get(startPosition) > secondMax) {
+			secondMax = list.get(startPosition);
+		}
+
+		return getSecondMax(list, startPosition + 1, firstMax, secondMax);
 	}
 }
