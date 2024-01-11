@@ -29,18 +29,18 @@ public class SecondMax {
 
 	private static int getSecondMax(List<Integer> list) {
 
-		return getSecondMax(list, 0, Integer.MIN_VALUE, Integer.MIN_VALUE);
+		return getSecondMax(list, 0, list.get(0), list.get(1));
 	}
 	
 	private static int getSecondMax(List<Integer> list, int startPosition, int firstMax, int secondMax) {
 		if(list.size() <= startPosition)
 			return secondMax;
-		
-		if(list.get(startPosition) >= firstMax) {
+		int currentElement = list.get(startPosition);
+		if(currentElement >= firstMax) {
 			secondMax = firstMax;
-			firstMax = list.get(startPosition);
+			firstMax = currentElement;
 		}
-		if(list.get(startPosition) < firstMax && list.get(startPosition) > secondMax) {
+		if(currentElement < firstMax && currentElement > secondMax) {
 			secondMax = list.get(startPosition);
 		}
 
