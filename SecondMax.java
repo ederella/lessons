@@ -1,4 +1,4 @@
-package recursion;
+package yyy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,11 @@ public class SecondMax {
 
 		List<Integer> list = new ArrayList<Integer>();
 
-		list.add(1);
 		list.add(90);
-		list.add(2);
-		list.add(3);
-		list.add(4);
+		list.add(10);
+		list.add(0);
+		list.add(0);
+		list.add(0);
 		
 		System.out.println(getSecondMax(list));		
 		
@@ -28,8 +28,10 @@ public class SecondMax {
 	}
 
 	private static int getSecondMax(List<Integer> list) {
-
-		return getSecondMax(list, 0, list.get(0), list.get(1));
+		int firstMax = Math.max(list.get(0), list.get(1));
+		int secondMax = Math.min(list.get(0), list.get(1));
+		
+		return getSecondMax(list, 2, firstMax, secondMax);
 	}
 	
 	private static int getSecondMax(List<Integer> list, int startPosition, int firstMax, int secondMax) {
