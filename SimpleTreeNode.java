@@ -44,7 +44,7 @@ class SimpleTree<T> {
 
 	public List<SimpleTreeNode<T>> GetAllNodes() {		
 		if(Root == null)
-			return null;
+			return new ArrayList<SimpleTreeNode<T>>();
 		
 		return GetAllNodes(Root);
 	}
@@ -63,7 +63,7 @@ class SimpleTree<T> {
 
 	public List<SimpleTreeNode<T>> FindNodesByValue(T val) {
 		if(Root == null)
-			return null;
+			return new ArrayList<SimpleTreeNode<T>>();
 		return FindNodesByValue(Root, val);
 	}
 
