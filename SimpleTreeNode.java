@@ -31,16 +31,18 @@ class SimpleTree<T> {
 		ParentNode.Children.add(NewChild);
 	}
 
-	public void DeleteNode(SimpleTreeNode<T> NodeToDelete) {
-		if(NodeToDelete == null) {
-			return;
-		}
-		if(NodeToDelete.Parent == null) {
-			Root = null;
-			return;
-		}
-		NodeToDelete.Parent.Children.remove(NodeToDelete);
-	}
+	 public void DeleteNode(SimpleTreeNode<T> NodeToDelete) {
+
+         if(NodeToDelete == null || NodeToDelete.Parent == null) {
+
+               return;
+
+         }
+
+         NodeToDelete.Parent.Children.remove(NodeToDelete);
+
+         NodeToDelete.Parent = null;
+   }
 
 	public List<SimpleTreeNode<T>> GetAllNodes() {		
 		if(Root == null)
