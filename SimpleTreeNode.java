@@ -31,38 +31,18 @@ class SimpleTree<T> {
 		ParentNode.Children.add(NewChild);
 	}
 
-    public void DeleteNode(SimpleTreeNode<T> NodeToDelete) {
+	public void DeleteNode(SimpleTreeNode<T> NodeToDelete) {
 
-        if(NodeToDelete == null || NodeToDelete.Parent == null) {
+		if (NodeToDelete == null || NodeToDelete == Root) {
+			return;
+		}
+		if (GetAllNodes().contains(NodeToDelete)) {
+			NodeToDelete.Parent.Children.remove(NodeToDelete);
+			NodeToDelete.Parent = null;
+		}
 
-              return;
+	}
 
-        }
-
-        boolean isDeleted = NodeToDelete.Parent.Children.remove(NodeToDelete);
-
-        if(isDeleted)
-        	nullify(NodeToDelete);
-
-  }
-
- 
-
-  public void nullify(SimpleTreeNode<T> node){
-
-        if(node.Children == null || node.Children.isEmpty()){
-
-              node = null;
-
-              return;
-
-        }
-
-        for (SimpleTreeNode<T> currentNode : node.Children) {
-        	 nullify(currentNode);            
-		}        
-        node = null;
-  }
   
 	public List<SimpleTreeNode<T>> GetAllNodes() {		
 		if(Root == null)
@@ -103,21 +83,8 @@ class SimpleTree<T> {
 	}
 
 	public void MoveNode(SimpleTreeNode<T> OriginalNode, SimpleTreeNode<T> NewParent) {
-		if(OriginalNode == null) {
-			return;
-		}
-		if(OriginalNode.Parent!=null) {
-			OriginalNode.Parent.Children.remove(OriginalNode);
-		}
-		
-		OriginalNode.Parent = NewParent;
-		
-		if(NewParent != null) {
-			if(NewParent.Children == null) {
-				NewParent.Children = new ArrayList<SimpleTreeNode<T>>();
-			}
-			NewParent.Children.add(OriginalNode);
-		}
+		 DeleteNode(OriginalNode);
+	     AddChild(NewParent, OriginalNode);
 	}
 
 	public int Count() {
