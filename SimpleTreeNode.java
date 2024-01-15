@@ -83,7 +83,8 @@ class SimpleTree<T> {
 	}
 
 	public void MoveNode(SimpleTreeNode<T> OriginalNode, SimpleTreeNode<T> NewParent) {
-		if (GetAllNodes().contains(OriginalNode)) {
+		List<SimpleTreeNode<T>> list = GetAllNodes();
+		if (list.contains(OriginalNode) && list.contains(NewParent)) {
 			DeleteNode(OriginalNode);
 			AddChild(NewParent, OriginalNode);
 		}
