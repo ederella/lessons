@@ -83,8 +83,10 @@ class SimpleTree<T> {
 	}
 
 	public void MoveNode(SimpleTreeNode<T> OriginalNode, SimpleTreeNode<T> NewParent) {
-		 DeleteNode(OriginalNode);
-	     AddChild(NewParent, OriginalNode);
+		if (GetAllNodes().contains(OriginalNode)) {
+			DeleteNode(OriginalNode);
+			AddChild(NewParent, OriginalNode);
+		}
 	}
 
 	public int Count() {
