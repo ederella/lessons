@@ -39,9 +39,10 @@ class SimpleTree<T> {
 
         }
 
-        NodeToDelete.Parent.Children.remove(NodeToDelete);
+        boolean isDeleted = NodeToDelete.Parent.Children.remove(NodeToDelete);
 
-        nullify(NodeToDelete);
+        if(isDeleted)
+        	nullify(NodeToDelete);
 
   }
 
