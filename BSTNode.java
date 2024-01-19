@@ -41,8 +41,14 @@ class BST<T>
     }
     
     public BSTFind<T> FindNodeByKey(int key){
-    	if(Root == null)
-    		return null;
+    	
+    	if(Root == null){
+            BSTFind<T> finded = new BSTFind<T>();
+            finded.Node = null;
+            finded.NodeHasKey = false;
+            finded.ToLeft = false;
+            return finded;
+    	}
     	
     	return FindNodeByKey(Root, key);
      
@@ -170,13 +176,18 @@ class BST<T>
 		}
 		
 		replacer.Parent = finded.Node.Parent;
-		replacer.LeftChild = finded.Node.LeftChild;			
+		replacer.LeftChild = finded.Node.LeftChild;	
+		if(replacer != finded.Node.RightChild)
+			replacer.RightChild = finded.Node.RightChild;	
 		
-		if(replacer.Parent.NodeKey > replacer.NodeKey)
+		if(replacer.Parent != null && replacer.Parent.NodeKey > replacer.NodeKey)
 			replacer.Parent.LeftChild = replacer;
 		
-		if(replacer.Parent.NodeKey <= replacer.NodeKey)
+		if(replacer.Parent != null && replacer.Parent.NodeKey <= replacer.NodeKey)
 			replacer.Parent.RightChild = replacer;
+		
+		if(replacer.Parent == null)
+			Root = replacer;
 		
 		if(finded.Node.LeftChild!= null)
 			finded.Node.LeftChild.Parent = replacer;
