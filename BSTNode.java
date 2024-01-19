@@ -140,7 +140,13 @@ class BST<T>
 			return true;
 		}			
 		
-		if(finded.Node.LeftChild == null) {
+		if(finded.Node.LeftChild == null ) {
+			if(finded.Node == Root) {
+				Root = finded.Node.RightChild;
+				Root.Parent = null;
+				finded.Node.RightChild = null;
+				return true;
+			}
 			if(isRight(finded.Node)) {
 				finded.Node.Parent.RightChild = finded.Node.RightChild;
 			}
@@ -152,7 +158,13 @@ class BST<T>
 			return true;
 		}
 		
-		if(finded.Node.RightChild == null) {
+		if(finded.Node.RightChild == null ) {
+			if(finded.Node == Root) {
+				Root = finded.Node.LeftChild;
+				Root.Parent = null;
+				finded.Node.LeftChild = null;
+				return true;
+			}
 			if(isRight(finded.Node)) {
 				finded.Node.Parent.RightChild = finded.Node.LeftChild;
 			}
