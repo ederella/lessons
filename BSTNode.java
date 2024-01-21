@@ -48,7 +48,7 @@ class BST<T>
     	if(Root == null)
            return new BSTFind<T>();
     	
-           if(key == node.NodeKey){
+        if(key == node.NodeKey){
     		BSTFind<T> finded = new BSTFind<T>();
     		finded.Node = node;
     		finded.NodeHasKey = true;
@@ -151,6 +151,13 @@ class BST<T>
 			replacer.Parent.LeftChild = replacer.RightChild;
 		}
 		
+		if (replacer.RightChild == null && replacer.LeftChild == null) {
+			if (replacer.Parent.NodeKey > replacer.NodeKey)
+				replacer.Parent.LeftChild =null;
+			
+			if (replacer.Parent.NodeKey < replacer.NodeKey)
+				replacer.Parent.RightChild =null;
+		}
 		//put replacer to the place of deleting node
 		//update parent
 		replacer.Parent = node.Parent;
