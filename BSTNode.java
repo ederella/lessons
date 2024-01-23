@@ -232,4 +232,118 @@ class BST<T>
     	}
     	return Count(node.LeftChild) + Count(node.RightChild) + 1;
     }
+    
+    public ArrayList<BSTNode> WideAllNodes(){
+    	ArrayList<BSTNode> outList = new ArrayList<BSTNode>();
+    	if(Root == null)
+    		return outList;
+    	
+    	outList.add(Root);
+    	outList.addAll(getArrayOfNextLevel(outList));
+    	
+		return outList;
+    	
+    }
+    
+    private ArrayList<BSTNode> getArrayOfNextLevel(ArrayList<BSTNode> prevLevelList){
+    	ArrayList<BSTNode> outList = new ArrayList<BSTNode>();
+    	
+    	if(prevLevelList == null || prevLevelList.isEmpty())
+    		return outList;
+
+    	for (BSTNode node : prevLevelList) {
+			if (node.LeftChild != null)
+				outList.add(node.LeftChild);
+			if (node.RightChild != null)
+				outList.add(node.RightChild);			
+		}
+    	 outList.addAll(getArrayOfNextLevel(outList));
+    	 return outList;
+    }
+    
+    public ArrayList<BSTNode> DeepAllNodes(int order){
+
+    	if(order == 0){
+    		return DeepAllNodesForInOrder(Root);
+    	}
+    	if(order == 1){
+    		return DeepAllNodesForPostOrder(Root);
+    	}
+    	if(order == 2){
+    		return DeepAllNodesForPreOrder(Root);
+    	}
+		
+    	return new ArrayList<BSTNode>();    	
+    }
+    
+    private ArrayList<BSTNode> DeepAllNodesForInOrder(BSTNode<T> node) {
+		ArrayList<BSTNode> outList = new ArrayList<BSTNode>();
+		if (node == null)
+			return outList;
+
+		if (node.LeftChild != null)
+			outList.addAll(DeepAllNodesForInOrder(node.LeftChild));
+
+		outList.add(node);
+
+		if (node.RightChild != null)
+			outList.addAll(DeepAllNodesForInOrder(node.RightChild));
+
+		return outList;
+	}
+
+	private ArrayList<BSTNode> DeepAllNodesForPostOrder(BSTNode<T> node) {
+		ArrayList<BSTNode> outList = new ArrayList<BSTNode>();
+		if (node == null)
+			return outList;
+
+		if (node.LeftChild != null)
+			outList.addAll(DeepAllNodesForPostOrder(node.LeftChild));
+
+		if (node.RightChild != null)
+			outList.addAll(DeepAllNodesForPostOrder(node.RightChild));
+
+		outList.add(node);
+
+		return outList;
+	}
+
+	private ArrayList<BSTNode> DeepAllNodesForPreOrder(BSTNode<T> node) {
+		ArrayList<BSTNode> outList = new ArrayList<BSTNode>();
+		if (node == null)
+			return outList;
+
+		outList.add(node);
+
+		if (node.LeftChild != null)
+			outList.addAll(DeepAllNodesForPreOrder(node.LeftChild));
+
+		if (node.RightChild != null)
+			outList.addAll(DeepAllNodesForPreOrder(node.RightChild));
+
+		return outList;
+	}
+
+	public void invert(){
+		invert(Root);
+   }
+
+	private void invert(BSTNode<T> node) {
+		if (node == null)
+			return;
+
+		swapChildren(node);
+
+		if (node.LeftChild != null)
+			invert(node.LeftChild);
+
+		if (node.RightChild != null)
+			invert(node.RightChild);
+	}
+	
+	private void swapChildren(BSTNode<T> node){
+		BSTNode<T> left = node.LeftChild;
+		node.LeftChild = node.RightChild;
+		node.RightChild = left;
+	}
 }
