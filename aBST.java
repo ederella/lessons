@@ -5,7 +5,7 @@ class aBST {
 
 	public aBST(int depth) {
 
-		int tree_size = (2<<depth - 1) - 1;
+		int tree_size = (2<<depth) - 1;
 		
 		Tree = new Integer[tree_size];
 		
