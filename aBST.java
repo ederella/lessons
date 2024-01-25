@@ -35,7 +35,7 @@ class aBST {
 	
 	public int AddKey(int key) {
 		Integer finded = FindKeyIndex(key);
-		if (finded == null || finded > 0)
+		if (finded == null)
 			return -1;
 
 		if (finded < 0) {
@@ -47,6 +47,11 @@ class aBST {
 			Tree[0] = key;
 			return 0;
 		}
+
+		if( finded >= 0) {
+			return finded;
+		}
+		
 		return -1;
 	}
 }
