@@ -10,12 +10,13 @@ class Heap {
 	}
 
 	public void MakeHeap(int[] a, int depth) {
-		HeapArray = new int[depth];
+		int size = (2<<depth) - 1;
+		HeapArray = new int[size];
 		if (a == null)
 			return;
-		int count = a.length > depth ? depth : a.length;
+		int count = a.length > size ? size : a.length;
 
-		for (int i = 0; i < depth; i++) {
+		for (int i = 0; i < size; i++) {
 			HeapArray[i] = -1;
 		}
 		for (int i = 0; i < count; i++) {
