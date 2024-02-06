@@ -3,9 +3,11 @@ package trees;
 import java.util.*;
 
 public class SimpleTreeNode<T> {
-	
+
 	public T NodeValue;
+
 	public SimpleTreeNode<T> Parent;
+
 	public List<SimpleTreeNode<T>> Children;
 
 	public SimpleTreeNode(T val, SimpleTreeNode<T> parent) {
@@ -44,14 +46,11 @@ class SimpleTree<T> {
 	}
 
 	public void DeleteNode(SimpleTreeNode<T> NodeToDelete) {
-
 		if (NodeToDelete == null || NodeToDelete == Root) {
 			return;
-
 		}
 
 		if (GetAllNodes().contains(NodeToDelete)) {
-
 			if (NodeToDelete.Parent != null && NodeToDelete.Parent.Children != null)
 				NodeToDelete.Parent.Children.remove(NodeToDelete);
 
@@ -81,7 +80,6 @@ class SimpleTree<T> {
 		}
 
 		return outList;
-
 	}
 
 	public List<SimpleTreeNode<T>> FindNodesByValue(T val) {
@@ -106,9 +104,7 @@ class SimpleTree<T> {
 		for (SimpleTreeNode<T> child : node.Children) {
 			outList.addAll(FindNodesByValue(child, val));
 		}
-
 		return outList;
-
 	}
 
 	public void MoveNode(SimpleTreeNode<T> OriginalNode, SimpleTreeNode<T> NewParent) {
@@ -119,7 +115,6 @@ class SimpleTree<T> {
 			DeleteNode(OriginalNode);
 			AddChild(NewParent, OriginalNode);
 		}
-
 	}
 
 	public int Count() {
@@ -128,7 +123,6 @@ class SimpleTree<T> {
 	}
 
 	private int Count(SimpleTreeNode<T> node) {
-
 		if (node == null)
 			return 0;
 
@@ -139,9 +133,7 @@ class SimpleTree<T> {
 				count += Count(child);
 			}
 		}
-
 		return count;
-
 	}
 
 	public int LeafCount() {
@@ -161,5 +153,30 @@ class SimpleTree<T> {
 			count += LeafCount(child);
 		}
 		return count;
+	}
+	
+	public ArrayList<T> EvenTrees(){
+		return EvenTrees(Root);
+	}
+	
+	public ArrayList<T> EvenTrees(SimpleTreeNode<T> node){
+		ArrayList<T> outList = new ArrayList<T>();
+		
+		int count = Count(node);
+		if(count == 1)
+			return outList;
+		
+		if (count % 2 == 0) {
+			if (node.Parent != null) {
+				outList.add(node.Parent.NodeValue);
+				outList.add(node.NodeValue);
+			}
+		}
+			
+		for (SimpleTreeNode<T> child : node.Children) {
+			outList.addAll(EvenTrees(child));
+		}
+
+		return outList;		
 	}
 }
