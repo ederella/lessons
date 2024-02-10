@@ -1,18 +1,24 @@
 package graph;
 
+
 import java.util.*;
 
 class Vertex {
 	public int Value;
 
+	public boolean Hit;
+
 	public Vertex(int val) {
 		Value = val;
+		Hit = false;
 	}
 }
 
 class SimpleGraph {
 	Vertex[] vertex;
+
 	int[][] m_adjacency;
+
 	int max_vertex;
 
 	public SimpleGraph(int size) {
@@ -60,4 +66,51 @@ class SimpleGraph {
 		m_adjacency[v1][v2] = 0;
 		m_adjacency[v2][v1] = 0;
 	}
+	
+	public ArrayList<Vertex> DepthFirstSearch(int VFrom, int VTo) {
+
+		Stack<Integer> dfsStack = new Stack<Integer>();	
+		clearHits();
+		
+		DepthFirstSearch(VFrom, VTo, dfsStack);
+		
+		ArrayList<Vertex> path = new ArrayList<Vertex>();
+		for (int i = 0; i < dfsStack.size(); i++) {
+			path.add(vertex[dfsStack.get(i)]);
+		}
+
+		return path;
+	}
+
+	private void DepthFirstSearch (int VFrom, int VTo, Stack<Integer> dfsStack) {
+
+		vertex[VFrom].Hit = true;
+		dfsStack.push(VFrom);		
+		
+		if(IsEdge(VFrom, VTo)){
+			dfsStack.push(VTo);
+			return;
+		}
+		for (int i = 0; i < vertex.length; i++) {
+			if(IsEdge(VFrom, i) && !vertex[i].Hit){
+				DepthFirstSearch(i, VTo, dfsStack);
+				return;
+			}
+		}
+		
+		dfsStack.pop();
+		
+		if(dfsStack.isEmpty())
+			return;		
+		DepthFirstSearch(dfsStack.pop(), VTo, dfsStack);
+	}
+
+	
+
+	private void clearHits() {
+		for(int i = 0; i< vertex.length; i++){
+			vertex[i].Hit = false;
+		}
+	}
+
 }
