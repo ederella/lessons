@@ -105,34 +105,45 @@ class SimpleGraph {
 	}
 
 	public ArrayList<Vertex> BreadthFirstSearch(int VFrom, int VTo) {
-		Queue<Integer> bfsQueue = new LinkedList<>();
+		Queue<Integer> bfsQueue = new LinkedList<Integer>();
+		ArrayList<Vertex> path = new ArrayList<Vertex>();
 		clearHits();
 
-		ArrayList<Vertex> path = BreadthFirstSearch(VFrom, VTo, bfsQueue);
+		bfsQueue.add(VFrom);
+		vertex[VFrom].Hit = true;
+		path.add(vertex[VFrom]);
 
-		return path;
-	}
+		while (!bfsQueue.isEmpty()) {
+			int current = bfsQueue.poll();
+			boolean existsNew = false;
 
-	private ArrayList<Vertex> BreadthFirstSearch(int vFrom, int vTo, Queue<Integer> bfsQueue) {
-		vertex[vFrom].Hit = true;
-		ArrayList<Vertex> path = new ArrayList<Vertex>();
-		path.add(vertex[vFrom]);
+			if (IsEdge(current, VTo)) {
+				vertex[VTo].Hit = true;
+				path.add(vertex[VTo]);
+				removeExcessFromPath(path, bfsQueue);
+				return path;
+			}
 
-		if (IsEdge(vFrom, vTo)) {
-			path.add(vertex[vTo]);
-			return path;
-		}
-		for (int i = 0; i < vertex.length; i++) {
-			if (IsEdge(vFrom, i) && !vertex[i].Hit) {
-				bfsQueue.add(vFrom);
-				return path.addAll(BreadthFirstSearch(i, vTo, bfsQueue))? path : new ArrayList<Vertex>();
+			for (int i = 0; i < vertex.length; i++) {
+				if (IsEdge(current, i) && !vertex[i].Hit) {
+					vertex[i].Hit = true;
+					bfsQueue.add(i);
+					existsNew = true;
+					path.add(vertex[i]);
+				}
+			}
+			if (!existsNew) {
+				path.remove(vertex[current]);
 			}
 		}
 
-		if (bfsQueue.isEmpty())
-			return new ArrayList<Vertex>();
+		return new ArrayList<Vertex>();
+	}
 
-		return BreadthFirstSearch(bfsQueue.poll(), vTo, bfsQueue);
+	private void removeExcessFromPath(ArrayList<Vertex> path, Queue<Integer> bfsQueue) {
+		while (!bfsQueue.isEmpty()) {
+			path.remove(vertex[bfsQueue.poll()]);
+		}
 	}
 
 	private void clearHits() {
