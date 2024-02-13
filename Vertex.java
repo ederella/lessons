@@ -151,5 +151,47 @@ class SimpleGraph {
 			vertex[i].Hit = false;
 		}
 	}
+	
+	public ArrayList<Vertex> WeakVertices()
+    {
+		ArrayList<Vertex> weak = new ArrayList<Vertex>();
+		
+		for (int i = 0; i < vertex.length; i++) {
+			if(isWeak(i)) {
+				weak.add(vertex[i]);
+			}
+		}			
+		return weak;
+    }
+
+	private boolean isWeak(int v) {
+		ArrayList<Integer> adjVertices = listAdjacent(v);
+
+		for (Integer vertexIndex : adjVertices) {
+			if (hasAjacency(vertexIndex, adjVertices)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean hasAjacency(int v, ArrayList<Integer> adjVertices) {
+		for (Integer vertex : adjVertices) {
+			if (v != vertex && IsEdge(v, vertex)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private ArrayList<Integer> listAdjacent(int v) {
+		ArrayList<Integer> adjVertices = new ArrayList<Integer>();
+		for (int i = 0; i < m_adjacency.length; i++) {
+			if(v!= i && IsEdge(v, i)) {
+				adjVertices.add(i);
+			}
+		}
+		return adjVertices;
+	}
 
 }
