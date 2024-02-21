@@ -3,15 +3,16 @@ package sort3;
 import java.util.*;
 
 public class SortLevel {
+	
 	public static ArrayList<Integer> KnuthSequence(int array_size) {
+
 		LinkedList<Integer> sequence = new LinkedList<Integer>();
-		int el = 1;
-		while (array_size > el) {
-			sequence.push(el);
-			el = 3 * el + 1;
+		sequence.push(1);
+		while (array_size > sequence.peek()) {
+			sequence.push(3 * sequence.peek() + 1);
+
 		}
 		return new ArrayList<Integer>(sequence);
-
 	}
 
 	public static void sortShell(int[] array) {
