@@ -5,6 +5,8 @@ import java.util.*;
 public class SortLevel {
 
 	public static int ArrayChunk(int[] M) {
+		if(M.length == 0)
+			return -1;
 		int nIndex = M.length / 2;
 		int N = M[nIndex];
 		int i1 = 0;
@@ -18,13 +20,12 @@ public class SortLevel {
 				i2--;
 
 			if (i1 == i2 - 1 && M[i1] > M[i2]) {
-				int m1 = M[i1];
-				M[i1] = M[i2];
-				M[i2] = m1;
+				swap(M, i1, i2);
 				nIndex = M.length / 2;
 				N = M[nIndex];
 				i1 = 0;
 				i2 = M.length - 1;
+				continue;
 			}
 			if (i1 == i2 || (i1 == i2 - 1 && M[i1] < M[i2])) {
 				return nIndex;
@@ -32,10 +33,13 @@ public class SortLevel {
 
 			nIndex = nIndex == i1 ? i2 : nIndex == i2 ? i1 : nIndex;
 
-			int m1 = M[i1];
-			M[i1] = M[i2];
-			M[i2] = m1;
+			swap(M, i1, i2);
 		}
+	}
 
+	private static void swap(int[] M, int i1, int i2) {
+		int m1 = M[i1];
+		M[i1] = M[i2];
+		M[i2] = m1;
 	}
 }
