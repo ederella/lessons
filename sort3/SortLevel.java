@@ -5,16 +5,17 @@ import java.util.*;
 public class SortLevel {
 	
 	public static ArrayList<Integer> KnuthSequence(int array_size) {
-
 		LinkedList<Integer> sequence = new LinkedList<Integer>();
 		sequence.push(1);
-		while (array_size > sequence.peek()) {
-			sequence.push(3 * sequence.peek() + 1);
 
+		while (true) {
+			int nextElement = 3 * sequence.peek() + 1;
+			if (array_size <= nextElement)
+				return new ArrayList<Integer>(sequence);
+			sequence.push(nextElement);
 		}
-		return new ArrayList<Integer>(sequence);
 	}
-
+	
 	public static void sortShell(int[] array) {
 
 		ArrayList<Integer> sequence = KnuthSequence(array.length);
