@@ -168,16 +168,11 @@ public class SortLevel {
 	}
 
 	public static ArrayList KthOrderStatisticsStep(int[] Array, int L, int R, int k) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
 		if (Array.length == 0 || L < 0 || R > Array.length - 1 || k < L || k > R) {
-			return new ArrayList<Integer>();
-		}
-		int N = ArrayChunk(Array, L, R);
-		if (N == k) {
-			ArrayList<Integer> result = new ArrayList<Integer>();
-			result.add(L);
-			result.add(R);
 			return result;
 		}
+		int N = ArrayChunk(Array, L, R);
 
 		if (N < k) {
 			L = N + 1;
@@ -185,6 +180,8 @@ public class SortLevel {
 		if (N > k) {
 			R = N - 1;
 		}
-		return KthOrderStatisticsStep(Array, L, R, k);
+		result.add(L);
+		result.add(R);
+		return result;
 	}
 }
