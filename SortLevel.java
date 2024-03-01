@@ -184,4 +184,32 @@ public class SortLevel {
 		result.add(R);
 		return result;
 	}
+	
+	public static ArrayList<Integer> MergeSort(ArrayList<Integer> input) {
+		if (input.size() <= 1) {
+			return input;
+		}
+
+		ArrayList<Integer> sublist1 = MergeSort(new ArrayList<Integer>(input.subList(0, input.size() / 2)));
+		ArrayList<Integer> sublist2 = MergeSort(new ArrayList<Integer>(input.subList(input.size() / 2, input.size())));
+
+		ArrayList<Integer> result = new ArrayList<Integer>();
+
+		while (!sublist1.isEmpty() && !sublist2.isEmpty()) {
+
+			if (sublist1.get(0) < sublist2.get(0)) {
+				result.add(sublist1.remove(0));
+				continue;
+			}
+			if (sublist1.get(0) >= sublist2.get(0)) {
+				result.add(sublist2.remove(0));
+				continue;
+			}
+		}
+
+		result.addAll(sublist1);
+		result.addAll(sublist2);
+
+		return result;
+	}
 }
