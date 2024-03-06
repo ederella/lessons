@@ -12,7 +12,7 @@ public class ksort {
 		if (!s.matches("[a-h]\\d{2}"))
 			return -1;
 
-		return (int) s.charAt(0) - 97 + Integer.valueOf(s.substring(1));
+		return 100 * ((int) s.charAt(0) - 97) + Integer.valueOf(s.substring(1));
 	}
 
 	public boolean add(String s) {
