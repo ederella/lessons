@@ -17,11 +17,15 @@ public class BinarySearch {
 		int central = (Right+Left) / 2;
 		if(N == arr[central]) {
 			found = 1;
+			this.Left = 0;
+			this.Right = arr.length - 1;			
 			return;
 		}
 		
 		if(Right - Left <=0) {
 			found = -1;
+			this.Left = 0;
+			this.Right = arr.length - 1;
 			return;
 		}
 		if(N < arr[central]) 
