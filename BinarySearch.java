@@ -20,20 +20,25 @@ public class BinarySearch {
 			found = 1;
 			return;
 		}
-		if (Right - Left <= 0) {
+		if (N < arr[central]) {
+			Right = central - 1;
+			found = 0;
+		}
+		if (N > arr[central]) {
+			Left = central + 1;
+			found = 0;
+		}
+		if (Right < Left) {
 			found = -1;
 			return;
 		}
-		if (Right - Left == 1) {
-			found = N == arr[Right] ? 1 : -1;
+
+		if (Right - Left <= 1) {
+			found = arr[Right] == N || arr[Left] == N ? 1 : -1;
 			return;
 		}
-		if (N < arr[central])
-			Right = central - 1;
-
-		if (N > arr[central])
-			Left = central + 1;
 	}
+	
 	public int GetResult() {
 		return found;
 	}
