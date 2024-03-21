@@ -1,14 +1,17 @@
 package decisionTree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Category {
 
 	private ArrayList<String> keys;
 
 	private String name;
+
 
 	public Category(String name) {
 		this.keys = new ArrayList<String>();
@@ -32,8 +35,12 @@ public class Category {
 
 	public ArrayList<String> getKeys() {
 		ArrayList<String> result = new ArrayList<String>();
-		result.addAll(result);
+		result.addAll(keys);
 		return result;
+	}
+	
+	public int size() {
+		return keys.size();
 	}
 
 	public void addKey(String key) {
@@ -69,7 +76,7 @@ public class Category {
 
 	}
 
-	public double calculateGain(Category parentCategory) {
+	public double calculateGain(Category resultCategory) {
 		HashMap<String, HashMap<String, Integer>> groupCategories = new HashMap<String, HashMap<String, Integer>>();
 
 		for (int i = 0; i < keys.size(); i++) {
@@ -77,15 +84,13 @@ public class Category {
 			if (!groupCategories.containsKey(keys.get(i)))
 				groupCategories.put(keys.get(i), new HashMap<String, Integer>());
 
-			if (!groupCategories.get(keys.get(i)).containsKey(parentCategory.keys.get(i))) {
-				groupCategories.get(keys.get(i)).put(parentCategory.keys.get(i), 0);
+			if (!groupCategories.get(keys.get(i)).containsKey(resultCategory.keys.get(i))) {
+				groupCategories.get(keys.get(i)).put(resultCategory.keys.get(i), 0);
 			}
-			groupCategories.get(keys.get(i)).put(parentCategory.keys.get(i), groupCategories.get(keys.get(i)).get(parentCategory.keys.get(i)) + 1);
+			groupCategories.get(keys.get(i)).put(resultCategory.keys.get(i), groupCategories.get(keys.get(i)).get(resultCategory.keys.get(i)) + 1);
 		}
 
 		double childEntropy = 0;
-
-
 		
 		for (Map.Entry<String, HashMap<String, Integer>> groupCategory : groupCategories.entrySet()) {
 			int totalValues = 0;
@@ -95,6 +100,15 @@ public class Category {
 			childEntropy += calculateEntropy(groupCategory.getValue()) * ((double) totalValues / (double) keys.size());
 		}
 
-		return parentCategory.calculateEntropy() - childEntropy;
+		return resultCategory.calculateEntropy() - childEntropy;
 	}
+	
+	public ArrayList<String> listKeysDistinct(){
+		return new ArrayList<String>(keys.stream().distinct().collect(Collectors.toList()));
+	}
+	
+	public String toString() {
+		return name+ " "+ Arrays.toString(keys.toArray());
+	}
+
 }

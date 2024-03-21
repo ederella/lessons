@@ -1,20 +1,30 @@
 package decisionTree;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DecisionTreeTest {
+import org.junit.jupiter.api.Test;
+
+class DecisionTreeTest {
+
+	@Test
+	final void testCreate() throws Exception {
+		DecisionTree tree = new DecisionTree();
 	
-	public static void main(String[] string) throws Exception{
-		DecisionTreeCalulator tree = new DecisionTreeCalulator();
+		tree.create("input.csv");
 		
-		tree.fill("input.csv");
-		
-		HashMap<String, Double> gains = tree.calculateGain();
-
-		for (Entry<String, Double> gain : gains.entrySet()) {
-			System.out.println(gain.getKey() + " - " + gain.getValue());
-		}		
+		assertTrue(tree.getTree().name.equals("Outlook"));
+		assertTrue(tree.getTree().children.get(0).name.equals("Humidity"));
+		assertTrue(tree.getTree().children.get(0).children.get(0).name.equals("Play Tennis"));
+		assertTrue(tree.getTree().children.get(0).children.get(0).decision.equals("No"));
+		assertTrue(tree.getTree().children.get(0).children.get(1).name.equals("Play Tennis"));
+		assertTrue(tree.getTree().children.get(0).children.get(1).decision.equals("Yes"));
+		assertTrue(tree.getTree().children.get(1).name.equals("Play Tennis"));
+		assertTrue(tree.getTree().children.get(1).decision.equals("Yes"));
+		assertTrue(tree.getTree().children.get(2).name.equals("Wind"));
+		assertTrue(tree.getTree().children.get(2).children.get(0).name.equals("Play Tennis"));
+		assertTrue(tree.getTree().children.get(2).children.get(0).decision.equals("Yes"));
+		assertTrue(tree.getTree().children.get(2).children.get(1).name.equals("Play Tennis"));
+		assertTrue(tree.getTree().children.get(2).children.get(1).decision.equals("No"));
 	}
 
 }
