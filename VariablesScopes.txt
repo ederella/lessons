@@ -1,0 +1,906 @@
+//было 
+public class PartialPaymentInfo implements CBBagKeysRU{
+
+	protected CBBag bag;
+	protected CBBag pBag;
+	protected CBBag npBag;
+	protected CBBag currentPlanBag;
+	protected CBBag cBag;
+	protected CBDate today;
+	protected CBDate nextInstallmentDate;
+	protected CBDate newMaturityDate = null;
+	protected CBCurrency creditSum;
+	protected CBCurrency totalAmount;
+	protected CBCurrency debtAmount;
+	protected CBCurrency earlyPaymentCommissionAmount;
+	protected CBCurrency nextInstallmentAmount;
+	protected CBCurrency partialPaymentAmount;
+	protected CBCurrency principalRemaining;
+	protected CBCurrency balloonLastInstallmentAmountToBePaid;
+	protected CBCurrency restRO;
+	protected CBCurrency restRI;
+	protected CBCurrency collectedRO;
+	protected CBCurrency collectedRI;
+	protected String creditType;
+	protected String exchangeCode;
+	protected int interestScheme;
+	protected int startRow = 1;
+	protected int finalRow = 0;
+	protected CBCurrency interestSum = CBCurrency.ZERO;
+	protected String paymentType = "";
+	CBTime calculationTime;
+	CBCurrency hundred = CBCurrencyFactory.newCBCurrency(100);
+	CBCurrency twelve = CBCurrencyFactory.newCBCurrency(12);
+	protected CBCurrency oldInstallmentAmount = null;
+	private CBCurrency creditClosingAmountOnPaymentDate;
+...
+}
+
+//стало - поля класса стали приватными
+public class PartialPaymentInfo implements CBBagKeysRU{
+
+	private CBBag bag;
+	private CBBag pBag;
+	private CBBag npBag;
+	private CBBag currentPlanBag;
+	private CBBag cBag;
+	private CBDate today;
+	private CBDate nextInstallmentDate;
+	private CBDate newMaturityDate = null;
+	private CBCurrency creditSum;
+	private CBCurrency totalAmount;
+	private CBCurrency debtAmount;
+	private CBCurrency earlyPaymentCommissionAmount;
+	private CBCurrency nextInstallmentAmount;
+	private CBCurrency partialPaymentAmount;
+	private CBCurrency principalRemaining;
+	private CBCurrency balloonLastInstallmentAmountToBePaid;
+	private CBCurrency restRO;
+	private CBCurrency restRI;
+	private CBCurrency collectedRO;
+	private CBCurrency collectedRI;
+	private String creditType;
+	private String exchangeCode;
+	private int interestScheme;
+	private int startRow = 1;
+	private int finalRow = 0;
+	private CBCurrency interestSum = CBCurrency.ZERO;
+	private String paymentType = "";
+	private CBTime calculationTime;
+	private CBCurrency hundred = CBCurrencyFactory.newCBCurrency(100);
+	private CBCurrency twelve = CBCurrencyFactory.newCBCurrency(12);
+	private CBCurrency oldInstallmentAmount = null;
+	private CBCurrency creditClosingAmountOnPaymentDate;
+	...}
+	
+	
+	
+//было
+protected static CBBag approveWaitingCustomer(CBBag inBag) throws CBException{
+
+		CBBag outBag = CBBagFactory.createBag();
+		CBBag custBag = CBBagFactory.createBag();
+		CBBag bag = CBBagFactory.createBag();
+		CBBag modifyBag = CBBagFactory.createBag();
+		String modifyrequest = null;
+		CreditMappingPOMData map  = null;
+		int customerNumber = inBag.get(TABLE, 0, SAMECUSTOMER).toSimpleInt();
+		boolean isNewCustomer = inBag.get(SELECT).toString().equalsIgnoreCase("YES");
+		RequestLogPOMData requestData = null;
+		XMLElement response = null;
+		
+		try {
+		
+			bag.put(QUERYNUMBER, inBag.get(TABLE, 0, QUERYNUMBER).toSimpleLong());
+			getRequestLog(bag).copyTo(outBag);
+
+			int size = outBag.getSize(TABLE);		
+			
+			for(int k=0;k < size;k++)
+			{
+			  if(outBag.get(TABLE, k, INOUT).toString().equalsIgnoreCase("I"))
+				bag.put(TABLE, 0, RESULT, getRequestDetail(outBag.get(TABLE, k, OID).toSimpleLong()).get(RESULT).toString());
+			}
+			
+			size = bag.getSize(TABLE);
+			
+			outBag.clear();
+			
+			for(int k=0;k < size;k++)
+			{
+				XMLElement requestXML = new XMLElement();
+				requestXML.parseString(bag.get(TABLE, k, RESULT).toString());
+				
+				Application app = new Application();
+				/*....*/
+				app.parseXML(requestXML);
+				
+				map = Utils.getMapInfo(app.getLoan().getCred_id());
+				
+				if(map !=null)
+				{
+					requestData = Utils.getRequestLog(String.valueOf(map.queryId));
+					
+					if(requestData.modifyRequestId > 0)
+					{
+						modifyBag.put(QUERYNUMBER, requestData.modifyRequestId);
+						modifyBag = getRequestLog(modifyBag);
+						modifyrequest =getRequestDetail(modifyBag.get(TABLE, k, OID).toSimpleLong()).get(RESULT).toString();
+						modifyBag.clear();
+
+						String creditType = app.getLoan().getCred_type();
+						int bureauFlag   = app.getLoan().getBureau_flag();
+						requestXML = new XMLElement();
+						requestXML.parseString(modifyrequest);
+						app.parseXML(requestXML);	
+						app.getLoan().setCred_type(creditType);
+						app.getLoan().setBureau_flag(bureauFlag);
+					}
+					
+					if(isNewCustomer)
+					{
+						try {
+							/*....*/						
+							
+							Identity identity = null;
+							int i =0;
+							int psIndex = 0;
+							Identities identities = app.getCustomer().getIdentities();
+							for(Iterator iter = identities.iterator(); (iter!= null && iter.hasNext()); ){
+								identity = (Identity) iter.next();
+								//Passport
+								 if(identity.getType().equalsIgnoreCase("PS"))
+								 {
+									/*....*/
+								 }
+								 i++;
+							}
+							identities.getList().remove(psIndex);
+							identities.getList().add(identity);
+							app.getCustomer().setIdentities(identities);
+							
+							
+							//add new customer
+							Application.addNewCustomer(app.getCustomer().toCBBag()).copyTo(custBag);
+							
+							app.getCustomer().setOid(custBag.get(CUSTOMEROID).toSimpleLong());
+							app.getCustomer().setCustomerNumber(custBag.get(CUSTOMERNUMBER).toSimpleInt());
+							
+							//make application
+							response = app.processData();
+						}
+						catch(CBException ce){
+				
+							if(ce.id == 75030)/* client exists*/
+							{
+								throw new CBException(Constants.CUSTOMER_DATA_NOT_CHANGED, CBBagFactory.createBag());					
+							}
+							else
+							{
+								throw ce;
+							}
+						}
+					}
+					else
+					{
+						CBBag cusBag1 = CBBagFactory.createBag();
+						cusBag1.put(CUSTOMERNUMBER, customerNumber);
+						cusBag1 = CBCaller.call("MUSTERI_MUSTERIGETIR", cusBag1);
+						app.getCustomer().setCustomerNumber(customerNumber);
+						app.getCustomer().setOid(cusBag1.get(CUSTOMEROID).toSimpleLong());
+						cusBag1.clear();
+						
+						//make application
+						response = app.processData();
+					}
+				}
+			}
+			
+		} finally {
+
+		}
+		
+		//get application bag
+		CBBag appBag = getAppBag(response);
+		appBag.copyTo(outBag);
+		
+		return outBag;
+	
+	}	
+	
+	
+	//стало - ограничила области видимости переменных, перенесла их объявление ближе к месту их первого использования: String modifyrequest,CBBag modifyBag, int customerNumber, boolean isNewCustomer, CBBag custBag, CBBag bag, CreditMappingPOMData map
+	
+		protected static CBBag approveWaitingCustomer(CBBag inBag) throws CBException{
+
+		CBBag outBag = CBBagFactory.createBag();
+
+		XMLElement response = null;
+		
+		try {
+			CBBag bag = CBBagFactory.createBag();
+			bag.put(QUERYNUMBER, inBag.get(TABLE, 0, QUERYNUMBER).toSimpleLong());
+			getRequestLog(bag).copyTo(outBag);
+
+			int size = outBag.getSize(TABLE);		
+			
+			for (int i = 0; i < size; i++) {
+				if (outBag.get(TABLE, i, INOUT).toString().equalsIgnoreCase("I"))
+					bag.put(TABLE, 0, RESULT, getRequestDetail(outBag.get(TABLE, i, OID).toSimpleLong()).get(RESULT).toString());
+			}
+			
+			size = bag.getSize(TABLE);
+			
+			outBag.clear();
+			
+			for (int i = 0; i < size; i++) {
+				XMLElement requestXML = new XMLElement();
+				requestXML.parseString(bag.get(TABLE, i, RESULT).toString());
+				
+				Application app = new Application();
+				/*....*/
+				
+				app.parseXML(requestXML);
+				CreditMappingPOMData map  = Utils.getMapInfo(app.getLoan().getCred_id());
+				
+				if(map !=null)
+				{
+					RequestLogPOMData requestData = Utils.getRequestLog(String.valueOf(map.queryId));
+					
+					if(requestData.modifyRequestId > 0)
+					{
+						CBBag modifyBag = CBBagFactory.createBag();
+						modifyBag.put(QUERYNUMBER, requestData.modifyRequestId);
+						modifyBag = getRequestLog(modifyBag);
+						String modifyrequest = getRequestDetail(modifyBag.get(TABLE, i, OID).toSimpleLong()).get(RESULT).toString();
+						modifyBag = null;
+
+						String creditType = app.getLoan().getCred_type();
+						int bureauFlag   = app.getLoan().getBureau_flag();
+						requestXML = new XMLElement();
+						requestXML.parseString(modifyrequest);
+						app.parseXML(requestXML);	
+						app.getLoan().setCred_type(creditType);
+						app.getLoan().setBureau_flag(bureauFlag);
+					}
+					requestData = null;
+					
+					boolean isNewCustomer = inBag.get(SELECT).toString().equalsIgnoreCase("YES");
+					if(isNewCustomer)
+					{
+						try {
+							/*....*/
+							Identity identity = null;
+							int j =0;
+							int psIndex = 0;
+							Identities identities = app.getCustomer().getIdentities();
+							for(Iterator iter = identities.iterator(); (iter!= null && iter.hasNext()); ){
+								identity = (Identity) iter.next();
+								//Passport
+								 if(identity.getType().equalsIgnoreCase("PS"))
+								 {								
+									/*....*/
+								 }
+								 j++;
+							}
+							identities.getList().remove(psIndex);
+							identities.getList().add(identity);
+							app.getCustomer().setIdentities(identities);							
+							
+							//add new customer
+							CBBag custBag = CBBagFactory.createBag();
+							Application.addNewCustomer(app.getCustomer().toCBBag()).copyTo(custBag);							
+							app.getCustomer().setOid(custBag.get(CUSTOMEROID).toSimpleLong());
+							app.getCustomer().setCustomerNumber(custBag.get(CUSTOMERNUMBER).toSimpleInt());
+							
+							//make application
+							response = app.processData();
+						}
+						catch (CBException ce) {
+
+							if (ce.id == 75030)/* client exists */
+							{
+								throw new CBException(Constants.CUSTOMER_DATA_NOT_CHANGED, CBBagFactory.createBag());
+							} else {
+								throw ce;
+							}
+						}
+					}
+					else
+					{
+						int customerNumber = inBag.get(TABLE, 0, SAMECUSTOMER).toSimpleInt();
+						CBBag cusBag1 = CBBagFactory.createBag();
+						cusBag1.put(CUSTOMERNUMBER, customerNumber);
+						cusBag1 = CBCaller.call("MUSTERI_MUSTERIGETIR", cusBag1);
+						app.getCustomer().setCustomerNumber(customerNumber);
+						app.getCustomer().setOid(cusBag1.get(CUSTOMEROID).toSimpleLong());
+						cusBag1.clear();
+						
+						//make application
+						response = app.processData();
+					}
+				}
+			}
+			
+		} finally {
+
+		}
+		
+		//get application bag
+		CBBag appBag = getAppBag(response);
+		appBag.copyTo(outBag);
+		
+		return outBag;
+	
+	}
+	
+	
+	
+	//было
+	
+	class ExtraBureauRecord implements Comparable
+	{
+		/*...*/
+		
+		long queryId = 0L;
+		
+		public int        queryType;     	// CB.Query.BureauType
+		public String purpose;       		// CB.Query.Purpose
+		public CBCurrency loan_amt;      	// CB.Query.Loan_Amt
+		public String currency;      		// CB.Query.Currency
+		public CBDate startDate;    		// CB.Query.StartDate
+		public CBDate endDate;       		// CB.Query.EndDate
+		public int    cebOwner;      		// CB.Query.CEBOwner
+		public String subscriberType; 		// CB.Query.SubscriberType
+		public int request_owner;			// CB.Query.CEBOwner
+		public String dataFormat;			// CB.Query.DataFormat
+		public int dataFormatSort = DATA_FORMAT_SORT_NOT_DEF;//auxiliary field for further sort
+		private boolean isSaved = false;
+		...}
+		
+//стало - ограничила области видимости полей класса
+
+class ExtraBureauRecord implements Comparable
+	{
+		/*...*/
+		
+		private long queryId = 0L;
+		
+		protected int        queryType;     	// CB.Query.BureauType
+		protected String purpose;       		// CB.Query.Purpose
+		protected CBCurrency loan_amt;      	// CB.Query.Loan_Amt
+		protected String currency;      		// CB.Query.Currency
+		protected CBDate startDate;    		   // CB.Query.StartDate
+		protected CBDate endDate;       		// CB.Query.EndDate
+		protected int    cebOwner;      		// CB.Query.CEBOwner
+		protected String subscriberType; 		// CB.Query.SubscriberType
+		protected int request_owner;			// CB.Query.CEBOwner
+		protected String dataFormat;			// CB.Query.DataFormat
+		protected int dataFormatSort = DATA_FORMAT_SORT_NOT_DEF;//auxiliary field for further sort
+		private boolean isSaved = false;
+		....}
+		
+		
+//было
+class BureauRecord {
+		private int bureauType;
+		long queryId = 0L;
+		
+		//data variables
+		public CBDate dateOpened;
+		public CBDate dateClosed;
+		public CBDate dateLastUpdate;
+		public int loanTerm;
+		public int passedTerm;
+		public CBCurrency installmentAmount;
+		public String credTypeName;
+		public CBCurrency loanAmount;
+		public String currencyCode;
+		public CBCurrency outstandingAmount;
+		public CBCurrency overdueAmount;
+		public int accountStatus;
+		public CBCurrency currentStatus;
+		public CBCurrency worstStatus;
+		public CBDate lastPaymPatDate;
+		public String paymPat;
+		public CBCurrency paidAmount;
+	
+		
+		public long oID;
+		public boolean isSaved = false;
+		....}
+		
+//стало - ограничила области видимости полей класса
+
+	class BureauRecord {
+		private int bureauType; 
+		private long queryId = 0L;
+		
+		//data variables
+		protected CBDate dateOpened;
+		protected CBDate dateClosed;
+		protected CBDate dateLastUpdate;
+		protected int loanTerm;
+		protected int passedTerm;
+		protected CBCurrency installmentAmount;
+		protected String credTypeName;
+		protected CBCurrency loanAmount;
+		protected String currencyCode;
+		protected CBCurrency outstandingAmount;
+		protected CBCurrency overdueAmount;
+		protected int accountStatus;
+		protected CBCurrency currentStatus;
+		protected CBCurrency worstStatus;
+		protected CBDate lastPaymPatDate;
+		protected String paymPat;
+		protected CBCurrency paidAmount;
+		
+		protected long oID;
+		protected boolean isSaved = false;
+				....}
+				
+
+				
+//было	
+	private static String formatCBCurrency(CBCurrency amount) throws CBException {
+
+		try {
+			String amountString = amount.toString();
+			int index = amountString.indexOf(".");
+			if (index == -1) {
+				amountString += ".00";
+				index = amountString.indexOf(".");
+			}
+
+			int modThree = 0;
+			int timesThreeDigit = 0;
+			StringBuffer lastAdressString = new StringBuffer();
+
+			if (amountString.substring(0, index).length() > 3) {
+				if (index > 0) {
+					modThree = amountString.substring(0, index).length() % 3;
+					timesThreeDigit = amountString.substring(0, index).length() / 3;
+				} else {
+					modThree = amountString.length() % 3;
+					timesThreeDigit = amountString.length() / 3;
+				}
+
+				lastAdressString.append(amountString.substring(0, modThree));
+
+				for (int k = 0; k < timesThreeDigit; k++)
+					lastAdressString.append(" " + amountString.substring(modThree + (k * 3), modThree + (k * 3) + 3));
+
+				return lastAdressString.toString() + amountString.substring(index, amountString.length());
+			} else
+				return amountString;
+
+		} catch (RuntimeException e) {
+			throw e;
+		}
+	}
+	
+//стало  ограничила области видимости переменной StringBuffer lastAdressString, перенесла объявление ближе к месту первого использования
+
+	private static String formatCBCurrency(CBCurrency amount) throws CBException {
+
+		try {
+			String amountString = amount.toString();
+			int index = amountString.indexOf(".");
+			if (index == -1) {
+				amountString += ".00";
+				index = amountString.indexOf(".");
+			}
+
+			int modThree = 0;
+			int timesThreeDigit = 0;
+			
+			if (amountString.substring(0, index).length() > 3) {
+				if (index > 0) {
+					modThree = amountString.substring(0, index).length() % 3;
+					timesThreeDigit = amountString.substring(0, index).length() / 3;
+				} else {
+					modThree = amountString.length() % 3;
+					timesThreeDigit = amountString.length() / 3;
+				}
+				
+				StringBuffer lastAdressString = new StringBuffer();
+				lastAdressString.append(amountString.substring(0, modThree));
+
+				for (int k = 0; k < timesThreeDigit; k++)
+					lastAdressString.append(" " + amountString.substring(modThree + (k * 3), modThree + (k * 3) + 3));
+
+				return lastAdressString.toString() + amountString.substring(index, amountString.length());
+			} else
+				return amountString;
+
+		} catch (RuntimeException e) {
+			throw e;
+		}
+	}
+	
+	
+//было
+	private static CBBag offBalanceInterestTransfer(CBBag inBag, CBBag cardBag, CBBag creditBag) throws CBException
+	{
+		CBBag outBag = CBBagFactory.createBag();
+		CBCurrency accountBalance = CBCurrency.ZERO;
+		long debitAccountOID = 0L;
+		long creditAccountOID = 0L;
+		try
+		{
+			if (cardBag.existsBagKey(INTERESTACCOUNTOIDFORGREATERGROUP))
+			{
+				// - transfer
+				accountBalance = Util.getAccountBalance(cardBag.get(INTERESTACCOUNTOIDFORGREATERGROUP).toSimpleLong());
+				if (accountBalance.compare(CBCurrency.ZERO) > 0)
+				{
+					debitAccountOID = creditBag.get(INTERESTACCOUNTOIDFORGROUP1).toSimpleLong();
+					creditAccountOID = cardBag.get(INTERESTACCOUNTOIDFORGREATERGROUP).toSimpleLong();
+					/*...*/
+				}
+			}
+		}
+		catch (CBException ex)
+		{
+			ex.printStackTrace();
+			throw ex;
+		}
+		return outBag;
+	}
+	
+//стало - изменила область видимости переменных CBCurrency accountBalance, long debitAccountOID, long creditAccountOID, удалила неиспользуемую outBag
+
+	private static CBBag offBalanceInterestTransfer(CBBag inBag, CBBag cardBag, CBBag creditBag) throws CBException
+	{
+		try
+		{
+			if (cardBag.existsBagKey(INTERESTACCOUNTOIDFORGREATERGROUP))			{
+				// - transfer
+				CBCurrency accountBalance = Util.getAccountBalance(cardBag.get(INTERESTACCOUNTOIDFORGREATERGROUP).toSimpleLong());
+				if (accountBalance.compare(CBCurrency.ZERO) > 0)
+				{
+					long debitAccountOID = creditBag.get(INTERESTACCOUNTOIDFORGROUP1).toSimpleLong();
+					long creditAccountOID = cardBag.get(INTERESTACCOUNTOIDFORGREATERGROUP).toSimpleLong();
+				/*...*/
+				}
+			}
+		}
+		catch (CBException ex)
+		{
+			ex.printStackTrace();
+			throw ex;
+		}
+		return CBBagFactory.createBag();
+	}
+	
+//было
+	private static CBBag penaltyAccounting(CBBag inBag, CBBag cardBag) throws CBException
+	{
+		CBBag outBag = CBBagFactory.createBag();
+		CBCurrency paidPenalty = CBCurrency.ZERO;
+		long debitAccountOID = 0L;
+		CBCurrency accountBalance = CBCurrency.ZERO;
+		String accountType = "";
+		String accountNR = "";
+		try
+		{
+			// - payment 408->706
+			paidPenalty = inBag.get(OVERDUEPENALTY).toCBCurrency();
+			debitAccountOID = inBag.get(CUSTOMERACCOUNTOID).toSimpleLong();
+			if (paidPenalty.compare(CBCurrency.ZERO) > 0)
+			{
+				debit_curAcc_credit_commAcc(inBag, debitAccountOID, paidPenalty, MFSE_COMMISSIONDEBIT, MFSE_COMMISSIONCREDIT, 601);
+			}
+			// - Inserting transactions for technical accounts
+			for (int i = 0; i < cardBag.getSize(ACCOUNTTABLE); i++)
+			{
+				accountType = cardBag.get(ACCOUNTTABLE, i, ACCOUNTTYPE).toString();
+				accountBalance = cardBag.get(ACCOUNTTABLE, i, ACCOUNTBALANCE).toCBCurrency();
+				accountNR = cardBag.get(ACCOUNTTABLE, i, ACCOUNTNR).toString();
+				if (accountBalance.compare(CBCurrency.ZERO) > 0)
+				{
+					if (accountType.equalsIgnoreCase("2")) // 10069
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+					else if (accountType.equalsIgnoreCase("3")) // 10061
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+					else if (accountType.equalsIgnoreCase("0")) // 10080
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+				}
+			}
+		}
+		catch (CBException ex)
+		{
+			ex.printStackTrace();
+			throw ex;
+		}
+		return outBag;
+	}
+	
+//стало - изменила область видимости переменных
+		CBCurrency paidPenalty
+		long debitAccountOID
+		CBCurrency accountBalance
+		String accountType
+		String accountNR
+
+	private static CBBag penaltyAccounting(CBBag inBag, CBBag cardBag) throws CBException
+	{
+		try
+		{
+			// - payment 408->706
+			CBCurrency paidPenalty = inBag.get(OVERDUEPENALTY).toCBCurrency();
+			
+			if (paidPenalty.compare(CBCurrency.ZERO) > 0)
+			{
+				long debitAccountOID = inBag.get(CUSTOMERACCOUNTOID).toSimpleLong();
+				debit_curAcc_credit_commAcc(inBag, debitAccountOID, paidPenalty, MFSE_COMMISSIONDEBIT, MFSE_COMMISSIONCREDIT, 601);
+			}
+			// - Inserting transactions for technical accounts
+			for (int i = 0; i < cardBag.getSize(ACCOUNTTABLE); i++)
+			{
+				String accountType = cardBag.get(ACCOUNTTABLE, i, ACCOUNTTYPE).toString();
+				CBCurrency accountBalance = cardBag.get(ACCOUNTTABLE, i, ACCOUNTBALANCE).toCBCurrency();
+				String accountNR = cardBag.get(ACCOUNTTABLE, i, ACCOUNTNR).toString();
+				if (accountBalance.compare(CBCurrency.ZERO) > 0)
+				{
+					if (accountType.equalsIgnoreCase("2")) // 10069
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+					else if (accountType.equalsIgnoreCase("3")) // 10061
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+					else if (accountType.equalsIgnoreCase("0")) // 10080
+					{
+						insertTechnicalAccountTransaction(inBag, accountNR, accountBalance);
+					}
+				}
+			}
+		}
+		catch (CBException ex)
+		{
+			ex.printStackTrace();
+			throw ex;
+		}	
+		return CBBagFactory.createBag();
+	}
+	
+//было
+public static CBBag print(CBBag inBag) throws CBException{
+		
+		CBBag outBag = CBBagFactory.createBag();
+		CBBag datBag = CBBagFactory.createBag();
+		
+		CBBag pdBag = CBBagFactory.createBag();
+		pdBag.put(DOCUMENTOID, inBag.get(PAYMENTOID).toSimpleLong());
+		pdBag = CBCaller.call("EXT_PD_GET_PAYMENT_DOCUMENT", pdBag);
+		
+		if(pdBag.get(STATUSCODE).toString().equals("8")) {
+			
+			CBBag bankBag = CBBagFactory.createBag();
+			bankBag.put(BIC, pdBag.get(RECEIVERBIC));
+			bankBag = CBCaller.call("CRED_RKC_GET_BANK", bankBag);
+			
+			String bankName = bankBag.get(BANKNAME).toString();
+			
+			String exchCode = Utils.getRBValue("CRED_"+pdBag.get(EXCHANGETYPE).toString(), true);
+			
+			datBag.put(BANKNAME, bankName);
+			datBag.put(EXCHANGETYPE, exchCode);
+			datBag.put(RECEIVERBIC, pdBag.get(RECEIVERBIC));
+			datBag.put(RECEIVERCORRESPONDENTACCOUNT, pdBag.get(RECEIVERCORRESPONDENTACCOUNT));
+			datBag.put(RECEIVER, pdBag.get(RECEIVERBANK));
+			datBag.put(DOCUMENTNUMBER, pdBag.get(DOCUMENTNUMBER));
+			datBag.put(DOCUMENTENTRYDATE, Formatter.formatDate(pdBag.get(DOCUMENTENTRYDATE).toCBDate()));
+			datBag.put(DATE_, Formatter.formatDate(pdBag.get(CHARGEOFFDATE).toCBDate()));
+			
+			CBBag pdrBag = listPrint(inBag, exchCode);
+			pdrBag.copyTo(datBag);
+			
+			datBag.put(TRANSFERAMOUNT, Formatter.formatCBCurrency(pdrBag.get(TRANSFERAMOUNT).toCBCurrency()));
+			
+			outBag.put(DOKUMANKODU, "3056");
+			outBag.put(DOKUMANDATA, datBag);
+			outBag.put(DOCFORMAT, "PDF");
+			outBag.put(CALLERSERVICENAME, "CRED_PDR_PRINT");
+			outBag = CBCaller.call("URN_DOCMANAGER_GENERATEDOCUMENT", outBag);
+		
+		} else {
+			
+			CBBag exBag = CBBagFactory.createBag();
+			exBag.put(STATUSCODE, RetailLoanHelper.getReferenceData("PRM_PD_DOCUMENT_STATUS", "CODE", "8", "DESCRIPTION"));
+			throw new CBException(PAYMENT_DOC_STATUS_SHOULD_BE, exBag);
+		}
+		
+		return outBag;
+		
+	}
+	
+//стало - изменила области видимости переменных outBag и datBag
+	public static CBBag print(CBBag inBag) throws CBException{
+
+		CBBag pdBag = CBBagFactory.createBag();
+		pdBag.put(DOCUMENTOID, inBag.get(PAYMENTOID).toSimpleLong());
+		pdBag = CBCaller.call("EXT_PD_GET_PAYMENT_DOCUMENT", pdBag);
+		
+		if(pdBag.get(STATUSCODE).toString().equals("8")) {
+			
+			CBBag bankBag = CBBagFactory.createBag();
+			bankBag.put(BIC, pdBag.get(RECEIVERBIC));
+			bankBag = CBCaller.call("CRED_RKC_GET_BANK", bankBag);
+			
+			String bankName = bankBag.get(BANKNAME).toString();
+			
+			String exchCode = Utils.getRBValue("CRED_"+pdBag.get(EXCHANGETYPE).toString(), true);
+			
+			CBBag datBag = CBBagFactory.createBag();
+			datBag.put(BANKNAME, bankName);
+			datBag.put(EXCHANGETYPE, exchCode);
+			datBag.put(RECEIVERBIC, pdBag.get(RECEIVERBIC));
+			datBag.put(RECEIVERCORRESPONDENTACCOUNT, pdBag.get(RECEIVERCORRESPONDENTACCOUNT));
+			datBag.put(RECEIVER, pdBag.get(RECEIVERBANK));
+			datBag.put(DOCUMENTNUMBER, pdBag.get(DOCUMENTNUMBER));
+			datBag.put(DOCUMENTENTRYDATE, Formatter.formatDate(pdBag.get(DOCUMENTENTRYDATE).toCBDate()));
+			datBag.put(DATE_, Formatter.formatDate(pdBag.get(CHARGEOFFDATE).toCBDate()));
+			
+			CBBag pdrBag = listPrint(inBag, exchCode);
+			pdrBag.copyTo(datBag);
+			
+			datBag.put(TRANSFERAMOUNT, Formatter.formatCBCurrency(pdrBag.get(TRANSFERAMOUNT).toCBCurrency()));
+			
+			CBBag outBag = CBBagFactory.createBag();
+			outBag.put(DOKUMANKODU, "3056");
+			outBag.put(DOKUMANDATA, datBag);
+			outBag.put(DOCFORMAT, "PDF");
+			outBag.put(CALLERSERVICENAME, "CRED_PDR_PRINT");
+			outBag = CBCaller.call("URN_DOCMANAGER_GENERATEDOCUMENT", outBag);
+			return outBag;
+		
+		} else {
+			
+			CBBag exBag = CBBagFactory.createBag();
+			exBag.put(STATUSCODE, RetailLoanHelper.getReferenceData("PRM_PD_DOCUMENT_STATUS", "CODE", "8", "DESCRIPTION"));
+			throw new CBException(PAYMENT_DOC_STATUS_SHOULD_BE, exBag);
+		}		
+	}
+	
+//было
+public static void add(CBBag inBag) throws CBException {
+
+		boolean isMultiple = false;		
+		long creditOid = 0L;
+		CBCurrency transferAmount = CBCurrency.ZERO;
+		
+		String transferType = inBag.get(TYPE).toString();
+		long paymentDocOid = inBag.existsBagKey(PAYMENTOID) ? inBag.get(PAYMENTOID).toSimpleLong() : 0L;
+		String batchName = inBag.get(BATCH).toString();
+		int transferCount = inBag.getSize(TABLEREGISTRYINFO);
+		long transferLogOid = 0L;
+		
+		if(transferCount > 0){
+			
+			isMultiple = transferCount > 1;
+			
+			for (int i = 0; i < transferCount; i++){
+				
+				creditOid = inBag.get(TABLEREGISTRYINFO, i, OID).toSimpleLong();	
+			
+				if(transferType.equalsIgnoreCase(TRANSFER_TYPE_VAT)){
+					transferAmount = getTableAmount(inBag, i, TAXBASE);
+				}
+				if(transferType.equalsIgnoreCase(TRANSFER_TYPE_COMMISSION)){
+					transferAmount = getTableAmount(inBag, i, COMMISSIONBASEAMOUNTCHARGED);
+				}
+				if(transferType.matches(TRANSFER_TYPE_LOAN_AMOUNT + "|" + TRANSFER_TYPE_ADD_SERVICE + "|" + TRANSFER_TYPE_INSURANCE)){
+					
+					if (inBag.existsBagKey(TABLEREGISTRYINFO, i, LIMITLESS) && inBag.get(TABLEREGISTRYINFO, i, LIMITLESS).toString() != null
+							&& inBag.get(TABLEREGISTRYINFO, i, LIMITLESS).toString().equalsIgnoreCase("0")){
+						if (inBag.existsBagKey(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT) && inBag.get(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT).toString() != null
+								&& inBag.get(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT).toString().trim().length() > 0){
+							transferAmount = getTableAmount(inBag, i, ADVANCECLOSEAMOUNT);
+						}
+					}
+					else
+						transferAmount = getTableAmount(inBag, i, TRANSFERAMOUNT);
+				}
+				if (transferType.equalsIgnoreCase(TRANSFER_TYPE_MERCH_COMMISSION)){
+					transferAmount = getTableAmount(inBag, i, MERCHANTCOMMISSION);
+				}
+				
+				if(RetailLoanHelper.isGreaterThanZero(transferAmount)){
+					transferLogOid = addDB(creditOid, transferAmount, transferType, paymentDocOid, isMultiple, batchName);
+
+					if (inBag.existsBagKey(VALUE17)){
+						addTransferAddServLog(inBag, transferLogOid, creditOid, 0L);
+					}
+				}
+			}
+			
+		} else {
+			
+			creditOid = getCreditOid(inBag);
+			
+			transferAmount = inBag.get(SUM).toCBCurrency();
+			
+			if(RetailLoanHelper.isGreaterThanZero(transferAmount)){
+				transferLogOid = addDB(creditOid, transferAmount, transferType, paymentDocOid, isMultiple, batchName);
+				
+				if (inBag.existsBagKey(VALUE17) && inBag.existsBagKey(SERVICEOID)){
+					addTransferAddServLog(inBag, transferLogOid, creditOid, inBag.get(SERVICEOID).toSimpleLong());
+				}
+			}
+		}
+		
+	}
+	
+	//стало - ограничила области видимости переменных
+	   isMultiple = false;		
+	   creditOid = 0L;
+	   transferAmount = CBCurrency.ZERO;
+	   transferLogOid = 0L;
+	   
+	public static void add(CBBag inBag) throws CBException {
+		String transferType = inBag.get(TYPE).toString();
+		long paymentDocOid = inBag.existsBagKey(PAYMENTOID) ? inBag.get(PAYMENTOID).toSimpleLong() : 0L;
+		String batchName = inBag.get(BATCH).toString();
+		int transferCount = inBag.getSize(TABLEREGISTRYINFO);		
+		
+		if(transferCount > 0){			
+			boolean isMultiple = transferCount > 1;
+			
+			for (int i = 0; i < transferCount; i++){
+				CBCurrency transferAmount = CBCurrency.ZERO;
+				
+				if(transferType.equalsIgnoreCase(TRANSFER_TYPE_VAT)){
+					transferAmount = getTableAmount(inBag, i, TAXBASE);
+				}
+				if(transferType.equalsIgnoreCase(TRANSFER_TYPE_COMMISSION)){
+					transferAmount = getTableAmount(inBag, i, COMMISSIONBASEAMOUNTCHARGED);
+				}
+				if(transferType.matches(TRANSFER_TYPE_LOAN_AMOUNT + "|" + TRANSFER_TYPE_ADD_SERVICE + "|" + TRANSFER_TYPE_INSURANCE)){
+					
+					if (inBag.existsBagKey(TABLEREGISTRYINFO, i, LIMITLESS) && inBag.get(TABLEREGISTRYINFO, i, LIMITLESS).toString() != null
+							&& inBag.get(TABLEREGISTRYINFO, i, LIMITLESS).toString().equalsIgnoreCase("0")){
+						if (inBag.existsBagKey(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT) && inBag.get(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT).toString() != null
+								&& inBag.get(TABLEREGISTRYINFO, i, ADVANCECLOSEAMOUNT).toString().trim().length() > 0){
+							transferAmount = getTableAmount(inBag, i, ADVANCECLOSEAMOUNT);
+						}
+					}
+					else
+						transferAmount = getTableAmount(inBag, i, TRANSFERAMOUNT);
+				}
+				if (transferType.equalsIgnoreCase(TRANSFER_TYPE_MERCH_COMMISSION)){
+					transferAmount = getTableAmount(inBag, i, MERCHANTCOMMISSION);
+				}
+				
+				if(RetailLoanHelper.isGreaterThanZero(transferAmount)){
+					long creditOid = inBag.get(TABLEREGISTRYINFO, i, OID).toSimpleLong();	
+					long transferLogOid = addDB(creditOid, transferAmount, transferType, paymentDocOid, isMultiple, batchName);
+
+					if (inBag.existsBagKey(VALUE17)){
+						addTransferAddServLog(inBag, transferLogOid, creditOid, 0L);
+					}
+				}
+			}
+			
+		} else {
+			CBCurrency transferAmount = inBag.get(SUM).toCBCurrency();			
+			if(RetailLoanHelper.isGreaterThanZero(transferAmount)){
+				boolean isMultiple = false;
+				long creditOid = getCreditOid(inBag);
+				long transferLogOid = addDB(creditOid, transferAmount, transferType, paymentDocOid, isMultiple, batchName);
+				
+				if (inBag.existsBagKey(VALUE17) && inBag.existsBagKey(SERVICEOID)){
+					addTransferAddServLog(inBag, transferLogOid, creditOid, inBag.get(SERVICEOID).toSimpleLong());
+				}
+			}
+		}
+		
+	}

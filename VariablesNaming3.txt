@@ -1,0 +1,52 @@
+7.1.
+		boolean flag = false; - boolean isAccountFound;
+		boolean valueUpdate = false; - boolean isUpdated;
+		boolean valueIsNotNull = value != null && value.trim().length() > 0; - boolean isValid;
+		boolean a = accTypeSys.equals("") && accTypeSys1.equals(""); - boolean isEmptyAccType;
+		boolean debitMatch = false;  - boolean isDebitMatch;
+		
+7.2.
+	boolean isError = (isAdding && isExist) || (isDeleting && !isExist); - boolean error = (isAdding && found) || (isDeleting && !found);
+	boolean isOk = controlFtmShop(bag); - boolean ok = controlFtmShop(bag);
+
+7.3.
+		for (int l = 0; l < tagChild1.getChildren().size(); l++) {...} - for (int i = 0; i < tagChild1.getChildren().size(); i++)		
+
+7.4.		
+		private static int getDifferenceInMonths(CBDate startDate, CBDate endDate){
+		...
+		}
+		private static CBCurrency calculateCoefficient(CBDate firstDate, CBDate lastDate){
+		...
+		}
+		
+		if(beginDate.compareTo(lhStartDate) < 0 && lastDate.between(lhStartDate, lhEndDate, false)){//lh - loan holiday, кредитные каникулы
+		...
+		}
+		
+7.5
+	//было
+	public static boolean isCallCenterAndDocdestation(CBBag inBag) throws CBException
+	{
+		String channelCode = CBSessionInfo.getKanalKodu();
+		boolean flag = false;
+		
+		if(channelCode.equals(MortgageConstants.CHANNEL_CALL_CENTER)
+				&& inBag.existsBagKey(DOCDESTINATION) 
+				&& inBag.get(DOCDESTINATION)!=null 
+				&& inBag.get(DOCDESTINATION).toString().length() > 1)
+		{
+			flag = true;
+		}
+		
+		return flag;
+	}
+	
+	//стало - избавились от переменной flag
+		public static boolean isCallCenterAndDocdestation(CBBag inBag) throws CBException
+	{		
+		return CBSessionInfo.getKanalKodu().equals(MortgageConstants.CHANNEL_CALL_CENTER)
+				&& inBag.existsBagKey(DOCDESTINATION) 
+				&& inBag.get(DOCDESTINATION)!=null 
+				&& inBag.get(DOCDESTINATION).toString().length() > 1
+	}

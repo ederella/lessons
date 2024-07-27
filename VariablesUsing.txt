@@ -1,0 +1,781 @@
+//1
+	//было
+		 public static void prepareMPLPaymentPlan(CBBag outBag) throws CBException {
+		 //...
+		int i = 1;
+    	for (; i < outBag.getSize(PAYMENTPLAN); i++){
+			//...
+		}
+		
+		 for (i = 0; i < limit; i++){
+    	    	//...
+    	 }
+		 
+		for (i = limit; i < size; i++) {
+			...
+    	 }
+		}
+		
+	//стало	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+		public static void prepareMPLPaymentPlan(CBBag outBag) throws CBException {
+		 //...		
+    	for (int i = 1; i < outBag.getSize(PAYMENTPLAN); i++){
+			//...
+		}
+		
+		for (int i = 0; i < limit; i++){
+    	    	//...
+    	 }
+		 
+		for (int i = limit; i < size; i++) {
+			...
+    	 }
+		}
+		
+		
+//2
+	//было
+	private static int findProfitAgainstIndex(int index,CBBag inBag) throws CBException{
+		long ticketNo 	= inBag.get(FISNOTABLE, index , FISNO).toSimpleLong();
+		int i			= 0;
+		for(;i<inBag.getSize(FISNOTABLE);i++){
+			if(inBag.get(FISNOTABLE, i , FISNO).toSimpleLong()==ticketNo && i!=index){
+				return i;
+			}
+		}
+
+		throw new CBException();
+	}
+	
+	//стало - не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+	private static int findProfitAgainstIndex(int index, CBBag inBag) throws CBException {
+		final long ticketNo = inBag.get(FISNOTABLE, index, FISNO).toSimpleLong();
+
+		for (int i = 0; i < inBag.getSize(FISNOTABLE); i++) {
+			if (inBag.get(FISNOTABLE, i, FISNO).toSimpleLong() == ticketNo && i != index) {
+				return i;
+			}
+		}
+		throw new CBException();
+	}
+	
+//3
+	//было
+	private void remUncollPayment(HistoryRecord curHr){
+		
+		if(unCollHrs == null) return;
+		
+		int i = 0;
+		int count = unCollHrs.size();
+		HistoryRecord hr = null;
+		
+		for(; i < count; i++){
+			hr = (HistoryRecord) unCollHrs.get(i);
+			if(hr.installmentNo == curHr.installmentNo && hr.ppOid == curHr.ppOid){
+				unCollHrs.remove(i);
+				return;
+			}
+		}
+	}
+	
+	//стало	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+		private void remUncollPayment(HistoryRecord curHr) {
+
+		if (unCollHrs == null)
+			return;
+
+		int count = unCollHrs.size();
+		HistoryRecord hr = null;
+
+		for (int i = 0; i < count; i++) {
+			hr = (HistoryRecord) unCollHrs.get(i);
+			if (hr.installmentNo == curHr.installmentNo && hr.ppOid == curHr.ppOid) {
+				unCollHrs.remove(i);
+				return;
+			}
+		}
+	}
+	
+//4
+	//было
+			int i = 0;
+			if (tableFromScreen > 0)
+			{
+				for(; i < tableFromScreen; i++){
+					sumOfServicesPriceFromScreen = sumOfServicesPriceFromScreen.add(inBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+				}
+			}
+			i = 0;
+			if (tableFromDB > 0)
+			{
+				for(; i < tableFromDB; i++){
+					sumOfServicesPriceFromDB = sumOfServicesPriceFromDB.add(creditBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+				}
+			}
+			
+	//стало		- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла		
+
+			for(int i = 0; i < tableFromScreen; i++){
+				sumOfServicesPriceFromScreen = sumOfServicesPriceFromScreen.add(inBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+			}
+
+			for(int i = 0; i < tableFromDB; i++){
+				sumOfServicesPriceFromDB = sumOfServicesPriceFromDB.add(creditBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+			}
+
+//5
+	//было
+	private static CBCurrency getTotalAddServCost(CBBag inBag) throws CBException
+    {
+        int asCount = inBag.getSize(SERVICEINFOS);
+        int i = 0;
+        CBCurrency totalCost = CBCurrency.ZERO; 
+       
+        if (asCount > 0)
+        {
+        	for(; i < asCount; i++){
+        		totalCost = totalCost.add(inBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+        	}
+        }
+        
+        return totalCost;
+        
+    }
+	
+	//стало 	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+	 private static CBCurrency getTotalAddServCost(CBBag inBag) throws CBException {
+		final int asCount = inBag.getSize(SERVICEINFOS);
+
+		CBCurrency totalCost = CBCurrency.ZERO;
+
+		for (int i = 0; i < asCount; i++) {
+			totalCost = totalCost.add(inBag.get(SERVICEINFOS, i, PRICE).toCBCurrency());
+		}
+
+		return totalCost;
+
+	}
+	
+//6
+	//было
+		//process main period
+		int k = 0;
+		for(; k < loanPeriodCount; k++){
+			
+			alteredInstallmentNumber = k * months_in_year;
+			...
+			}
+		}
+		
+		//process remaining period
+		if(loanPeriodRemainder > 0){
+			
+			alteredInstallmentNumber = k * months_in_year;
+			
+			...
+		}
+		
+		
+	//стало	- не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+		//process main period
+			for(int i = 0; i < loanPeriodCount; i++){
+			
+			alteredInstallmentNumber = i * months_in_year;			
+			...
+		}
+		
+		//process remaining period
+		if(loanPeriodRemainder > 0){
+			
+			alteredInstallmentNumber = loanPeriodCount * months_in_year;
+			
+			...
+		}
+			
+//7
+	//было
+				int i = 0;
+				for(; i < curPPBag.getSize(PAYMENTPLAN); i++){
+					put(curPPBag, i, FIRSTPAYMENTDATE, get(curPPBag, i, LASTPAYMENTDATE).toCBDate());
+				}
+				CBDate maturityDate = curPPBag.get(PAYMENTPLAN, i- 1, LASTPAYMENTDATE).toCBDate();
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+				int paymentPlanSize = curPPBag.getSize(PAYMENTPLAN);
+				for (int i = 0; i < paymentPlanSize; i++) {
+					put(curPPBag, i, FIRSTPAYMENTDATE, get(curPPBag, i, LASTPAYMENTDATE).toCBDate());
+				}
+				CBDate maturityDate = curPPBag.get(PAYMENTPLAN, paymentPlanSize - 1, LASTPAYMENTDATE).toCBDate();
+				
+//8
+	//было
+	public static CBBag checkRatCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
+
+		CBBag outBag = CBBagFactory.createBag();
+
+		int asCount = inBag.getSize(SERVICEINFOS);
+		int i = 0;
+		String serviceType = "";
+		String ratCardNumber = "";
+			
+		String productCode = "";
+		String specialNumber = "";
+		String ratCardPrefix = "";
+		boolean cardNumberOK = false;
+			
+		for(; i < asCount; i++){...}
+		return outBag;
+		
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, инициализируем переменные в местах их использования
+	public static CBBag checkRatCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
+
+		CBBag outBag = CBBagFactory.createBag();
+
+		String serviceType = "";
+		String ratCardNumber = "";
+			
+		String productCode = "";
+		String specialNumber = "";
+		String ratCardPrefix = "";
+		boolean isValidCardNumber = false;
+		
+		final int asCount = inBag.getSize(SERVICEINFOS);	
+		for(int i = 0; i < asCount; i++){...}
+		return outBag;	
+		
+//9
+	//было
+	public static CBBag checkAltrAssistCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
+
+		CBBag outBag = CBBagFactory.createBag();
+		
+		try {
+
+			int asCount = inBag.getSize(SERVICEINFOS);
+			int i = 0;
+			String serviceType = "";
+			
+			for(; i < asCount; i++){
+				
+				serviceType = inBag.get(SERVICEINFOS, i, SERVICENAME).toString();
+
+				if(serviceType.equalsIgnoreCase(ADDSERV_SERVICETYPE_ALTERNATIVE_ASSISTANCE)){
+					
+					boolean setNumberOK = false;
+					String setNumber = inBag.get(SERVICEINFOS, i, CARDNUMBER).toString();
+										
+					outBag.put(CARDNUMBER, setNumber);
+					
+					//check set number length
+					setNumberOK = (setNumber.length() > 0 && setNumber.length() == 8);
+					if(!setNumberOK) 
+						throw new CBException(ParameterExceptions.ADDSERV_WRONG_NUMBER_ALTERNATIVE_ASSISTANCE, outBag);
+				}
+				
+			}
+			
+			return outBag;
+			
+		} catch (CBException e){
+			...
+		} catch (Exception e) {
+			...
+		} 
+
+	}
+	
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+	public static CBBag checkAltrAssistCardNumbers(CBBag inBag) throws cb.smg.general.utility.CBException {
+
+		CBBag outBag = CBBagFactory.createBag();
+		try {
+			int asCount = inBag.getSize(SERVICEINFOS);
+
+			for (int i = 0; i < asCount; i++) {
+
+				String serviceType = inBag.get(SERVICEINFOS, i, SERVICENAME).toString();
+
+				if (serviceType.equalsIgnoreCase(ADDSERV_SERVICETYPE_ALTERNATIVE_ASSISTANCE)) {
+
+					String setNumber = inBag.get(SERVICEINFOS, i, CARDNUMBER).toString();
+					if (setNumber.length() != 8)
+						throw new CBException(ParameterExceptions.ADDSERV_WRONG_NUMBER_ALTERNATIVE_ASSISTANCE, outBag);
+					
+					outBag.put(CARDNUMBER, setNumber);
+				}
+			}
+			return outBag;
+
+		}  catch (CBException e){
+			...
+		} catch (Exception e) {
+			...
+		} 
+	}
+	
+//10
+	//было
+				if(inBag.existsBagKey(TABLE1, 0, EQUIPMENT1)){
+					int asCount = inBag.getSize(TABLE1);
+					int i = 0;        		    
+					if (asCount > 0)
+					{
+						for(; i < asCount; i++){
+							docBag.put(EQUIPMENT, i, NUMBERA, i+1);
+							docBag.put(EQUIPMENT, i, EQUIPMENT1, inBag.get(TABLE1, i, EQUIPMENT1).toString());
+							docBag.put(EQUIPMENT, i, PRICE, inBag.get(TABLE1, i, PRICE).toString()+" "+inBag.get(TABLE1, i, EXCHANGECODE).toString());        	        		
+						}
+					}        	        
+				}
+
+				if(inBag.existsBagKey(TABLE2, 0,SERVICENAME)){
+					int asCount = inBag.getSize(TABLE2);
+					int i = 0;        		    
+					if (asCount > 0)
+					{
+						for(; i < asCount; i++){
+							docBag.put(SERVICEINFOS, i, SERVICENAME1, inBag.get(TABLE2, i,SERVICENAME).toString());
+							docBag.put(SERVICEINFOS, i, EXCHANGECODE, inBag.get(EXCHANGECODE).toString());
+							docBag.put(SERVICEINFOS, i, PRICE, inBag.get(TABLE2, i,PRICE).toCBCurrency());
+							docBag.put(SERVICEINFOS, i, AMOUNT1, 1);
+							docBag.put(SERVICEINFOS, i, PRICE1, inBag.get(TABLE2, i,PRICE).toCBCurrency());
+							docBag.put(SERVICEINFOS, i, PAYMENTTYPE, "");  
+						}
+					}        	        
+				}
+
+				if(inBag.existsBagKey(TABLE3, 0,INSURANCETIME)){
+					int asCount = inBag.getSize(TABLE3);
+					int i = 0;        		    
+					if (asCount > 0)
+					{
+						for(; i < asCount; i++){
+							docBag.put(INSURANCETABLE, i, INSURANCECOMPANY, "");
+							docBag.put(INSURANCETABLE, i, INSURANCETIME, inBag.get(TABLE3, i,INSURANCETIME).toString());        	        		
+							docBag.put(INSURANCETABLE, i, PRICE, inBag.get(TABLE3, i,AMOUNT).toString()+" "+inBag.get(EXCHANGECODE).toString());
+							docBag.put(INSURANCETABLE, i, PAYMENTTYPE, inBag.get(TABLE3, i,PAYMENTTYPE1).toString());        	        		 
+						}
+					}        	        
+				}
+				
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+				if (inBag.existsBagKey(TABLE1, 0, EQUIPMENT1)) {
+					final int asCount = inBag.getSize(TABLE1);
+
+					for (int i = 0; i < asCount; i++) {
+						docBag.put(EQUIPMENT, i, NUMBERA, i + 1);
+						docBag.put(EQUIPMENT, i, EQUIPMENT1, inBag.get(TABLE1, i, EQUIPMENT1).toString());
+						docBag.put(EQUIPMENT, i, PRICE, inBag.get(TABLE1, i, PRICE).toString() + " " + inBag.get(TABLE1, i, EXCHANGECODE).toString());
+					}
+
+				}
+
+				if (inBag.existsBagKey(TABLE2, 0, SERVICENAME)) {
+					final int asCount = inBag.getSize(TABLE2);
+
+					for (int i = 0; i < asCount; i++) {
+						docBag.put(SERVICEINFOS, i, SERVICENAME1, inBag.get(TABLE2, i, SERVICENAME).toString());
+						docBag.put(SERVICEINFOS, i, EXCHANGECODE, inBag.get(EXCHANGECODE).toString());
+						docBag.put(SERVICEINFOS, i, PRICE, inBag.get(TABLE2, i, PRICE).toCBCurrency());
+						docBag.put(SERVICEINFOS, i, AMOUNT1, 1);
+						docBag.put(SERVICEINFOS, i, PRICE1, inBag.get(TABLE2, i, PRICE).toCBCurrency());
+						docBag.put(SERVICEINFOS, i, PAYMENTTYPE, "");
+					}
+				}
+
+				if (inBag.existsBagKey(TABLE3, 0, INSURANCETIME)) {
+					int asCount = inBag.getSize(TABLE3);
+
+					for (int i = 0; i < asCount; i++) {
+						docBag.put(INSURANCETABLE, i, INSURANCECOMPANY, "");
+						docBag.put(INSURANCETABLE, i, INSURANCETIME, inBag.get(TABLE3, i, INSURANCETIME).toString());
+						docBag.put(INSURANCETABLE, i, PRICE, inBag.get(TABLE3, i, AMOUNT).toString() + " " + inBag.get(EXCHANGECODE).toString());
+						docBag.put(INSURANCETABLE, i, PAYMENTTYPE, inBag.get(TABLE3, i, PAYMENTTYPE1).toString());
+					}
+				} 
+
+				
+//11
+	//было
+	public static void putHoldsSkipDummyShops(CBBag inBag, long customerAccOid, String exchangeCode) throws CBException {
+		...
+		try {
+		
+			int addServCount = inBag.getSize(SERVICEINFOS);
+			
+			int i = 0;
+			long asOid = 0;
+
+			for(; i < addServCount; i++){
+
+				asOid = inBag.get(SERVICEINFOS, i, OID).toSimpleLong();
+
+				p.readByPrimaryKey(asOid);
+				...
+			}
+		
+		}
+		catch (CBException e)
+		{...
+		}
+		finally{
+			...
+		}
+	}
+	
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, создаем переменную там, где впервые используем
+	
+	public static void putHoldsSkipDummyShops(CBBag inBag, long customerAccOid, String exchangeCode) throws CBException {
+		...
+		try {
+		
+			final int addServCount = inBag.getSize(SERVICEINFOS);
+
+			for(int i = 0; i < addServCount; i++){
+
+				long asOid = inBag.get(SERVICEINFOS, i, OID).toSimpleLong();
+
+				p.readByPrimaryKey(asOid);
+				...
+				
+			}
+		
+		}
+		catch (CBException e)
+		{...
+		}
+		finally{
+			...
+		}
+	}
+//12
+	//было
+			//look for loan in the loan list
+			int loanCount = loanBag.getSize(TABLE);
+			int loanIndex = 0;
+			for(; loanIndex < loanCount; loanIndex++){
+				
+				if(loanBag.get(TABLE, loanIndex, CREDITOID).toSimpleLong() == creditOid){
+					
+					loanFound = true;
+					
+					...
+				}
+			}
+			
+			//add new loan
+			if(!loanFound){				
+				loanBag.put(TABLE, loanIndex, CREDITOID, creditOid);
+				loanBag.put(TABLE, loanIndex, CUSTOMEROID, paymentsBag.get(PAYMENTINFORMATION, paymentIndex, CUSTOMEROID));
+				loanBag.put(TABLE, loanIndex, EXCHANGECODE, paymentsBag.get(PAYMENTINFORMATION, paymentIndex, EXCHANGECODE));
+				...
+			}
+			
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+			//look for loan in the loan list
+			final int loanCount = loanBag.getSize(TABLE);
+
+			for(int i = 0; i < loanCount; i++){
+				
+				if(loanBag.get(TABLE, i, CREDITOID).toSimpleLong() == creditOid){
+					
+					loanFound = true;
+					
+					...
+				}
+			}
+			
+			//add new loan
+			if(!loanFound){				
+				loanBag.put(TABLE, loanCount, CREDITOID, creditOid);
+				loanBag.put(TABLE, loanCount, CUSTOMEROID, paymentsBag.get(PAYMENTINFORMATION, paymentIndex, CUSTOMEROID));
+				loanBag.put(TABLE, loanCount, EXCHANGECODE, paymentsBag.get(PAYMENTINFORMATION, paymentIndex, EXCHANGECODE));
+				...
+			}
+			
+			
+//13
+
+	//было
+	
+	protected static void printAdditionalServiceDocs(CBBag inBag, CBBag outBag) throws CBException
+	    {
+	        int asCount = inBag.getSize(SERVICEINFOS);
+	        int i = 0;
+	        int j = 0;
+	        CBBag docBag = CBBagFactory.createBag();
+	        String serviceType = "";
+	        String serviceName = "";
+	        String productCode = "";
+	        long addServOid = 0;
+		    
+	        if (asCount > 0)
+	        {
+	        	for(; i < asCount; i++){
+	        		
+	        		addServOid = inBag.get(SERVICEINFOS, i, OID).toSimpleLong();
+	        		serviceType = inBag.get(SERVICEINFOS, i, SERVICENAME).toString();
+	        		serviceName = inBag.get(SERVICEINFOS, i, SERVICENAME1).toString();
+	        		productCode = inBag.get(SERVICEINFOS, i, PRODUCTCODE).toString();
+	        		
+	        		if(serviceType.equalsIgnoreCase(ADDSERV_SERVICETYPE_LIFEINSURANCE_RENESSAINSE)) continue;	        		
+
+	        		if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_RATCARD)){
+	        			docBag.clear();
+	        			docBag.put(OID, addServOid);
+	        			docBag = CBCaller.call("CRED_GENERATE_ADDSERV_RATCARD_RECEIPT_CERT", docBag);
+	        		}
+	        		
+	        		else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_INSUPROP)){
+	        			docBag.clear();
+	        			docBag.put(OID, addServOid);
+	        			docBag = CBCaller.call("CRED_GENERATE_ADDSERV_INSUPROP_RECEIPT_CERT", docBag);
+	        		}
+	        		
+	        		else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_UNEMPLINSU)){
+	        			docBag.clear();
+	        			docBag.put(OID, addServOid);
+	        			docBag = CBCaller.call("CRED_GENERATE_ADDSERV_UNEMPLOY_INSU_POLICY", docBag);
+	        		}
+	        		
+	        		else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERV_SERVICETYPE_UNEMPLOYMENT_INSURANCE_MAKS)){
+	        			docBag.clear();
+	        			docBag.put(OID, addServOid);
+	        			docBag = CBCaller.call("CRED_GENERATE_ADDSERV_UNEMPLOY_INSU_P_MAKS", docBag);
+	        		}	
+	        		
+						...
+	        		}
+        			outBag.put(SERVICELIST, j, -1, serviceName);
+        			outBag.put(SERVICELIST_NAME, j, -1, docBag.get(DOCUMENTID));
+	        		j++;
+	        	}
+	        }	        
+	    }
+		
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла, 
+		protected static void printAdditionalServiceDocs(CBBag inBag, CBBag outBag) throws CBException
+	    {
+	        final int asCount = inBag.getSize(SERVICEINFOS);	        
+	        
+	        CBBag docBag = CBBagFactory.createBag();
+
+
+	        for(int i = 0, j = 0 ; i < asCount; i++){
+	        	docBag.clear();				
+	        	
+				long addServOid = inBag.get(SERVICEINFOS, i, OID).toSimpleLong();				
+				docBag.put(OID, addServOid);
+				
+	        	String serviceType = inBag.get(SERVICEINFOS, i, SERVICENAME).toString();
+
+	        		
+	        	if(serviceType.equalsIgnoreCase(ADDSERV_SERVICETYPE_LIFEINSURANCE_RENESSAINSE)) {
+					continue;	        		
+				}
+	        	else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_RATCARD)){	        			
+	        			
+	        		docBag = CBCaller.call("CRED_GENERATE_ADDSERV_RATCARD_RECEIPT_CERT", docBag);
+	        	}
+	        		
+	        	else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_INSUPROP)){
+
+	        		docBag = CBCaller.call("CRED_GENERATE_ADDSERV_INSUPROP_RECEIPT_CERT", docBag);
+	        	}
+	        		
+	        	else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERVTYPE_UNEMPLINSU)){
+
+	        		docBag = CBCaller.call("CRED_GENERATE_ADDSERV_UNEMPLOY_INSU_POLICY", docBag);
+	        	}
+	        		
+	        	else if(serviceType.equalsIgnoreCase(RetailLoanConstants.ADDSERV_SERVICETYPE_UNEMPLOYMENT_INSURANCE_MAKS)){
+
+	        		docBag = CBCaller.call("CRED_GENERATE_ADDSERV_UNEMPLOY_INSU_P_MAKS", docBag);
+	        	}	
+	        		
+				...
+
+
+		  String serviceName = inBag.get(SERVICEINFOS, i, SERVICENAME1).toString();
+	          String productCode = inBag.get(SERVICEINFOS, i, PRODUCTCODE).toString();
+        			
+				
+		  outBag.put(SERVICELIST, j, -1, serviceName);
+        	  outBag.put(SERVICELIST_NAME, j, -1, docBag.get(DOCUMENTID));
+	          j++;
+	        }
+	        	        
+	    }
+		
+		
+//14
+	//было
+			int codeIndex = 0;
+			...
+			while (rs.next() && codeIndex < 10) {
+				
+				code = rs.getString("REJECTIONCODE");
+				codeDate = rs.getCBDate("REJECTIONDATE");
+				
+				if(!codeMap.containsKey(code)){
+					codeMap.put(code, code);
+					codes[codeIndex] = code;
+					codeDates[codeIndex] = codeDate;
+					codeIndex++;
+				}
+				
+			}
+			codeMap = null;
+			int codeCount = codeIndex;
+			int i = 0;
+			
+			for(;i < codeCount; i++){
+				
+				code = codes[i];
+				codeDate = codeDates[i];
+				
+				if(i == 0) { scoreBag.put(TABLE4, 0, CODE1, code); scoreBag.put(TABLE4, 0, DATENUMBER, codeDate); }
+				if(i == 1) { scoreBag.put(TABLE4, 0, CODE2, code); scoreBag.put(TABLE4, 0, DATENUMBER2, codeDate); }
+				if(i == 2) { scoreBag.put(TABLE4, 0, CODE3, code); scoreBag.put(TABLE4, 0, DATE3, codeDate); }
+				if(i == 3) { scoreBag.put(TABLE4, 0, CODE4, code); scoreBag.put(TABLE4, 0, DATETIME, codeDate); }
+				if(i == 4) { scoreBag.put(TABLE4, 0, CODE5, code); scoreBag.put(TABLE4, 0, DATETIME_, codeDate); }
+				if(i == 5) { scoreBag.put(TABLE4, 0, CODE, code); scoreBag.put(TABLE4, 0, DATEYEAR, codeDate); }
+				if(i == 6) { scoreBag.put(TABLE4, 0, CODED, code); scoreBag.put(TABLE4, 0, DATE, codeDate); }
+				if(i == 7) { scoreBag.put(TABLE4, 0, CODEOFUSERSAVED, code); 	scoreBag.put(TABLE4, 0, DATE_, codeDate); }
+				if(i == 8) { scoreBag.put(TABLE4, 0, CODEPAGE, code);	scoreBag.put(TABLE4, 0, DATESEPARATOR, codeDate); }
+				if(i == 9) { scoreBag.put(TABLE4, 0, RETURNCODE, code); scoreBag.put(TABLE4, 0, DATEINTERVAL, codeDate); }				
+			}
+			
+	//стало - не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+		   int codeIndex = 0;
+			...
+			
+			while (rs.next() && codeIndex < 10) {
+				
+				code = rs.getString("REJECTIONCODE");
+				codeDate = rs.getCBDate("REJECTIONDATE");
+				
+				if(!codeMap.containsKey(code)){
+					codeMap.put(code, code);
+					codes[codeIndex] = code;
+					codeDates[codeIndex] = codeDate;
+					codeIndex++;
+				}
+				
+			}
+			
+			codeMap = null;
+			final int codeCount = codeIndex;	
+
+			for(int i = 0; i < codeCount; i++){
+				
+				code = codes[i];
+				codeDate = codeDates[i];
+				
+				if (i == 0) {
+					scoreBag.put(TABLE4, 0, CODE1, code);
+					scoreBag.put(TABLE4, 0, DATENUMBER, codeDate);
+				}
+				if (i == 1) {
+					scoreBag.put(TABLE4, 0, CODE2, code);
+					scoreBag.put(TABLE4, 0, DATENUMBER2, codeDate);
+				}
+				if (i == 2) {
+					scoreBag.put(TABLE4, 0, CODE3, code);
+					scoreBag.put(TABLE4, 0, DATE3, codeDate);
+				}
+				if (i == 3) {
+					scoreBag.put(TABLE4, 0, CODE4, code);
+					scoreBag.put(TABLE4, 0, DATETIME, codeDate);
+				}
+				if (i == 4) {
+					scoreBag.put(TABLE4, 0, CODE5, code);
+					scoreBag.put(TABLE4, 0, DATETIME_, codeDate);
+				}
+				if (i == 5) {
+					scoreBag.put(TABLE4, 0, CODE, code);
+					scoreBag.put(TABLE4, 0, DATEYEAR, codeDate);
+				}
+				if (i == 6) {
+					scoreBag.put(TABLE4, 0, CODED, code);
+					scoreBag.put(TABLE4, 0, DATE, codeDate);
+				}
+				if (i == 7) {
+					scoreBag.put(TABLE4, 0, CODEOFUSERSAVED, code);
+					scoreBag.put(TABLE4, 0, DATE_, codeDate);
+				}
+				if (i == 8) {
+					scoreBag.put(TABLE4, 0, CODEPAGE, code);
+					scoreBag.put(TABLE4, 0, DATESEPARATOR, codeDate);
+				}
+				if (i == 9) {
+					scoreBag.put(TABLE4, 0, RETURNCODE, code);
+					scoreBag.put(TABLE4, 0, DATEINTERVAL, codeDate);
+				}
+				
+			}
+	
+//15
+	//было
+	private static CBBag getTodaysDistributedCreditsAccounts(CBBag inBag) throws CBException {
+		
+		CBBag outBag = CBBagFactory.createBag();
+		
+		try {
+			//fill conversion table
+			int conversionCount = inBag.getSize(EXCHANGEINFO);
+			int paymentCount = inBag.getSize(PAYMENTINFORMATION);
+			
+			int i = 0;
+			for (; i < conversionCount; i++) {
+				
+				//conversion info
+				outBag.put(TABLE, i, CREDITREFERRENCE, inBag.get(EXCHANGEINFO, i, CREDITREFERRENCE));
+				...
+			}
+			
+			//fill payment table
+			for (i = 0; i < paymentCount; i++) {
+				
+				//conversion info
+				outBag.put(TABLE1, i, CREDITREFERRENCE, inBag.get(PAYMENTINFORMATION, i, CREDITREFERRENCE));
+				...
+			}
+		} catch (CBException e) {
+			throw e;
+		} 
+		
+		return outBag;
+		
+	}
+	
+	//стало не используем переменную-счетчик за границами цикла, инициализируем в заголовке цикла
+	
+	private static CBBag getTodaysDistributedCreditsAccounts(CBBag inBag) throws CBException {
+		
+		CBBag outBag = CBBagFactory.createBag();
+		
+		try {
+			//fill conversion table
+			final int conversionCount = inBag.getSize(EXCHANGEINFO);
+			for (int i = 0; i < conversionCount; i++) {
+				
+				//conversion info
+				outBag.put(TABLE, i, CREDITREFERRENCE, inBag.get(EXCHANGEINFO, i, CREDITREFERRENCE));
+				...
+			}
+			
+			//fill payment table
+			final int paymentCount = inBag.getSize(PAYMENTINFORMATION);
+			for (int i = 0; i < paymentCount; i++) {
+				
+				//conversion info
+				outBag.put(TABLE1, i, CREDITREFERRENCE, inBag.get(PAYMENTINFORMATION, i, CREDITREFERRENCE));
+				...
+			}
+		} catch (CBException e) {
+			throw e;
+		} 
+		
+		return outBag;
+		
+	}

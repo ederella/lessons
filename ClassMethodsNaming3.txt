@@ -1,0 +1,109 @@
+//3.1
+public class NumberUtils {
+    private CBCurrency amount;
+    private static final String POINT = ".";
+	//...
+    
+    private NumberUtils() throws CBException {
+	}
+
+	public static NumberUtils FromCBCurrency(CBCurrency amount){
+		NumberUtils numberUtils = new NumberUtils();
+    	CBCurrencyInfo defCurInfo = CBCurrencyInfo.getDefaultCurrencyInfo();
+    	numberUtils.amount = amount == null?  CBCurrency.ZERO : amount.round(defCurInfo).setScale(2);
+
+		return numberUtils;
+	}
+	public static NumberUtils FromString(String s){
+		NumberUtils numberUtils = new NumberUtils();
+		if (s == null)
+    		numberUtils.amount = CBCurrency.ZERO;
+    	
+        if (s.indexOf(POINT) == -1)
+            s += ".0";
+			
+		numberUtils.amount = CBCurrencyFactory.newCBCurrency(s);        
+        CBCurrencyInfo defCurInfo = CBCurrencyInfo.getDefaultCurrencyInfo();
+		numberUtils.amount = numberUtils.amount.round(defCurInfo).setScale(2);
+		return numberUtils;
+	}
+}
+
+public class Logger  {
+	private CBBag logBag;
+	private int logCount;
+	String context;
+	String logType;
+	public long logReference;
+	
+	private Logger(){}
+	
+	public static Logger FromContextAndLogType(String context, String logType){
+		Logger logger = new Logger();
+		logger.context = context;
+		logger.logType = logType;
+		logger.logBag = CBBagFactory.createBag();
+		logger.logCount = 0;
+		return logger;
+	}
+	
+	public static Logger FromCBBag(CBBag bag){
+		Logger logger = new Logger();
+		logger.context = bag.get(CONTEXT).toString();
+		logger.logType = bag.get(LOGTYPE).toString();
+		logger.logBag = bag;
+		logger.logCount = 0;
+		return logger;
+	}	
+}
+
+
+public class ReportCustomer{
+	String name;
+	String secondName;
+	String surname;
+	
+	private ReportCustomer(){}
+	
+	public static ReportCustomer FromCBBag(CBBag inBag) throws CBException{
+		ReportCustomer cust = new ReportCustomer();
+		cust.name = inBag.get(NAME).toString();
+		cust.secondName = inBag.get(SECONDNAME).toString();
+		cust.surname = inBag.get(SURNAME).toString();
+		return cust;
+	}
+	
+	public static ReportCustomer FromCustomerNumber(long customerNumber){
+		ReportCustomer cust = new ReportCustomer();
+		CBQueryExecuter rs = new CBQueryExecuter("CUST_GET_CUSTOMER_BY_NUMBER");
+
+		try {
+			rs.setParameter("CUSTOMERNUMBER", customerNumber);
+			rs.executeQuery();
+
+			if (rs.next()) {
+				cust.name = rs.getString("AD");
+				cust.secondName = rs.getString("IKINCIAD");
+				cust.surname = rs.getString("SOYAD");
+			}
+
+		} finally {
+			if (rs != null)
+				rs.close();
+		}
+		return cust;
+	}
+}
+//3.2.
+//1
+public abstract class PrintDocProcessor{...}
+public class PrintDocReceiveProcessor extends PrintDocProcessor{...}
+public class PrintDocRelateProcessor  extends PrintDocProcessor{...}
+public class PrintDocUpdateProcessor extends PrintDocProcessor{...}
+
+//2
+public interface RequestCall {...}
+public interface GroupRequestCall {...}
+public class BaseRequestCall implements RequestCall{...}
+public class BaseRequestGroupCall implements GroupRequestCall{...}
+

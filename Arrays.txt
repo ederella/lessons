@@ -1,0 +1,296 @@
+//1-было
+private void getPaymentPlan()throws CBException{
+			//get payment plan
+			int creditType = Integer.parseInt(lData.creditproductgroup);
+			CBBag inBag = CBBagFactory.createBag();
+			CBBag tmpBag = CBBagFactory.createBag();
+			long restructedPaymentPlanOid;
+			long previousCreditOid = 0l;
+			if(isPurchasedAgreement) {
+				previousCreditOid = getPreviousCreditOid(_creditOID);
+			}
+			boolean isOldSoldToSfoOrIaEurope = false;
+			CBBag secBag = CBBagFactory.createBag();
+			secBag.put(CREDITOID, previousCreditOid);
+			secBag = CBCaller.call("BNKPAR_CRED_GET_PARTNERID", secBag);
+			if(secBag.existsBagKey(PARTNERSHIP) && secBag.get(PARTNERSHIP).toString().matches(NbchBureauConstants.SFO_EUROPE_PARTNERID+"|"+NbchBureauConstants.IA_EUROPE_PARNTERID)){ 
+				isOldSoldToSfoOrIaEurope= true;
+			}
+			String paymentPlansString = getPaymentPlanHistoryByPaymentPlanOid (lData.paymentplanoid);
+			String[] masOfPaymentPlans = paymentPlansString.length()>0 ? paymentPlansString.split(" ") : new String[]{};
+				
+			if (masOfPaymentPlans.length > 0)
+			{
+				this.isRestructured = true;
+				this.needRestructData = true;
+					
+				for (int i = 0; i < masOfPaymentPlans.length; i++)
+				{
+					restructedPaymentPlanOid = Long.parseLong(masOfPaymentPlans[i]);
+					inBag.put(OID, masOfPaymentPlans[i]);	
+					inBag = CBCaller.call("CRED_GET_DETAIL_PAYMENTPLAN_CREDIT_DEPT_INFORMATION",inBag);
+					addLoanRestrData(Long.parseLong(masOfPaymentPlans[i]));
+						
+					if (pplanBag.existsBagKey(COUNTER))
+						inBag.put(COUNTER, pplanBag.get(COUNTER).toSimpleInt() + 1);
+					
+					inBag.put(DATE3, getSonOdemeTarihiByPaymentPlanOid(lData.paymentplanoid));	
+					
+					inBag = deleteUnusedPaymentPlans(inBag);
+					inBag.copyTo(pplanBag);	
+					tmpBag.put(DATE3, inBag.get(DATE3));
+					inBag.clear();
+				}
+				
+				inBag.put(OID, lData.paymentplanoid);
+				inBag = CBCaller.call("CRED_GET_DETAIL_PAYMENTPLAN_CREDIT_DEPT_INFORMATION",inBag);
+				addLoanRestrData (lData.paymentplanoid);
+				inBag.put(GOODBADFLAG, true); //active payment plan
+				if (pplanBag.existsBagKey(COUNTER))
+					inBag.put(COUNTER, pplanBag.get(COUNTER).toSimpleInt() + 1);
+				inBag = deleteUnusedPaymentPlans(inBag);
+				inBag.remove(GOODBADFLAG);
+				inBag.remove(COUNTER);
+				if (inBag.existsBagKey(DATE3)) inBag.remove(DATE3);
+					inBag.copyTo(pplanBag);	
+			}			
+		}
+		
+//1-стало
+	private void getPaymentPlan()throws CBException{
+
+			CBBag inBag = CBBagFactory.createBag();
+			CBBag tmpBag = CBBagFactory.createBag();
+
+			long previousCreditOid = 0l;
+			if(isPurchasedAgreement) {
+				previousCreditOid = getPreviousCreditOid(_creditOID);
+			}
+			boolean isOldSoldToSfoOrIaEurope = false;
+			CBBag secBag = CBBagFactory.createBag();
+			secBag.put(CREDITOID, previousCreditOid);
+			secBag = CBCaller.call("BNKPAR_CRED_GET_PARTNERID", secBag);
+			if(secBag.existsBagKey(PARTNERSHIP) && secBag.get(PARTNERSHIP).toString().matches(NbchBureauConstants.SFO_EUROPE_PARTNERID+"|"+NbchBureauConstants.IA_EUROPE_PARNTERID)){ 
+				isOldSoldToSfoOrIaEurope= true;
+			}
+			String paymentPlansString = getPaymentPlanHistoryByPaymentPlanOid (lData.paymentplanoid);
+			if(paymentPlansString.length()>0){
+				
+			}
+			
+			List paymentPlans = Arrays.asList(paymentPlansString.split(" "));
+				
+			if (paymentPlans.size() > 0)
+			{
+				this.isRestructured = true;
+				this.needRestructData = true;
+				
+				for (Iterator iter = paymentPlans.iterator(); iter.hasNext();) {
+					long paymentPlanOid = ((Long) iter.next()).longValue();
+					inBag.put(OID, paymentPlanOid);
+					
+					inBag = CBCaller.call("CRED_GET_DETAIL_PAYMENTPLAN_CREDIT_DEPT_INFORMATION",inBag);
+					addLoanRestrData(paymentPlanOid);
+						
+					if (pplanBag.existsBagKey(COUNTER))
+						inBag.put(COUNTER, pplanBag.get(COUNTER).toSimpleInt() + 1);
+
+						inBag.put(DATE3, getSonOdemeTarihiByPaymentPlanOid(lData.paymentplanoid));	
+					
+					inBag = deleteUnusedPaymentPlans(inBag);
+					inBag.copyTo(pplanBag);	
+					tmpBag.put(DATE3, inBag.get(DATE3));
+					inBag.clear();
+				}
+				
+				inBag.put(OID, lData.paymentplanoid);
+				inBag = CBCaller.call("CRED_GET_DETAIL_PAYMENTPLAN_CREDIT_DEPT_INFORMATION",inBag);
+				addLoanRestrData (lData.paymentplanoid);
+				inBag.put(GOODBADFLAG, true); //active payment plan
+				if (pplanBag.existsBagKey(COUNTER))
+					inBag.put(COUNTER, pplanBag.get(COUNTER).toSimpleInt() + 1);
+				inBag = deleteUnusedPaymentPlans(inBag);
+				inBag.remove(GOODBADFLAG);
+				inBag.remove(COUNTER);
+				if (inBag.existsBagKey(DATE3)) inBag.remove(DATE3);
+					inBag.copyTo(pplanBag);	
+			}			
+		}		
+		
+//2-было		
+			if(!mailAddressTo.equals("")) {
+					String[] mailTosList = mailAddressTo.split(",");
+					for(int i = 0; i < mailTosList.length; i++){
+						
+						String mailTo = mailTosList[i].trim();
+						
+						if(mailTo.length() > 0) {
+							sendMail(mailTo, message.toString(), subject, from);
+						}
+						
+					}
+				}		
+
+	
+
+//2-стало				
+				if(!mailAddressTo.equals("")) {
+					List mailTosList = Arrays.asList(mailAddressTo.split(","));
+					for (Iterator iter = mailTosList.iterator(); iter.hasNext();) {
+						String mailTo = ((String) iter.next()).trim();
+						if(mailTo.length() > 0) {
+							sendMail(mailTo, message.toString(), subject, from);
+						}
+					}
+				}
+		
+		
+		
+//3-было
+protected String decodeScoringComments(CBBag iBag) throws CBException {
+	String scoringComments = "";
+	if(iBag.existsBagKey(MESSAGECOUNT) && iBag.get(MESSAGECOUNT).toString().length() > 0){
+		String[] scorMessages = iBag.get(MESSAGECOUNT).toString().split(",");
+		for(int i = 0; i < scorMessages.length; i++){
+			scoringComments += scorMessages[i] + "; ";
+		}
+	}
+	return scoringComments;
+}
+
+//3-стало
+	protected String decodeScoringComments(CBBag iBag) throws CBException {
+		if (iBag.existsBagKey(MESSAGECOUNT) && iBag.get(MESSAGECOUNT).toString().length() > 0) {
+			String scoringComments = iBag.get(MESSAGECOUNT).toString();
+			return scoringComments.replace(",", "; ");
+		}
+		return "";
+	}
+
+
+//4-было
+	private static boolean checkRules(String rulesTriggered, CBBag inBag) throws CBException {
+		
+		String[] rulesSelectionArray = inBag.get(RULENAME).toString().split(" ");
+		String[] rulesTrigeredArray = rulesTriggered.split(",");
+		
+		for(int i = 0; i < rulesSelectionArray.length; i++)
+		{
+			for(int j = 0; j < rulesTrigeredArray.length; j++)
+			{
+				if(rulesSelectionArray[i].equalsIgnoreCase(rulesTrigeredArray[j])) 
+					break;
+				
+				if(j == rulesTrigeredArray.length - 1) //if this code has been reached - selection rule is not found in rules triggered
+					return false;
+			}
+		}
+		return true;
+	}
+//4-стало
+	private static boolean checkRules(String rulesTriggered, CBBag inBag) throws CBException {
+		
+		List selectionRules = Arrays.asList(inBag.get(RULENAME).toString().split(" "));
+		List triggeredRules = Arrays.asList(rulesTriggered.split(","));
+		
+		for (Iterator iterSelection = selectionRules.iterator(); iterSelection.hasNext();) {
+			String selectionRule = (String) iterSelection.next();
+			
+			for (Iterator iterTrig = triggeredRules.iterator(); iterTrig.hasNext();) {
+				String triggeredRule = (String) iterTrig.next();
+				
+				if(selectionRule.equalsIgnoreCase(triggeredRule))
+					break;	
+				
+				if(!iterTrig.hasNext())
+					return false;//if this code has been reached - selection rule is not found in rules triggered
+			}			
+		}	
+		return true;
+	}
+
+//5-было
+	public static boolean checkUploadIds(List uploadIdList, List requiredTypeList) throws CBException{
+		
+		boolean checkPassed = false;
+		
+		if(requiredTypeList == null || requiredTypeList.size() == 0) {
+			checkPassed = true;
+			return checkPassed;
+		}
+		
+		if(uploadIdList != null && uploadIdList.size() > 0) {
+		
+			boolean[] typeFlags = new boolean[requiredTypeList.size()];
+				
+			CBBag uploadBag = list(uploadIdList);
+			
+			int uploadCount = uploadBag.getSize(TABLE);
+			
+			if(uploadCount > 0) {
+			
+				String[] uploadTypes = new String[uploadCount]; 
+				for(int i = 0; i < uploadCount; i++){
+					uploadTypes[i] = uploadBag.get(TABLE, i, DOCUMENTTYPE).toString();
+				}
+				
+				for(int i = 0; i < requiredTypeList.size(); i++){
+					
+					for(int k = 0; k < uploadCount; k++){
+						
+						if(requiredTypeList.get(i).equals(uploadTypes[k])){
+							typeFlags[i] = true;
+							break;
+						}
+					}
+					
+				}
+				
+				for(int i = 0; i < typeFlags.length; i++){
+					checkPassed = typeFlags[i];
+					if(!checkPassed) break;
+				}
+			}
+		}
+		
+		return checkPassed;
+		
+	}
+//5-стало
+		public static boolean checkUploadIds(List uploadIds, List requiredTypes) throws CBException{
+
+		if(requiredTypes == null || requiredTypes.size() == 0) {
+			return true;
+		}
+		
+		if(uploadIds == null || uploadIds.size() == 0) {
+			return false;
+		}
+		CBBag uploadBag = list(uploadIds);
+		
+		int uploadCount = uploadBag.getSize(TABLE);
+		if(uploadCount == 0) {
+			return false;
+		}		
+				
+		List uploadTypes = new ArrayList(uploadCount); 				
+		for(int i = 0; i < uploadCount; i++){
+			uploadTypes.add(uploadBag.get(TABLE, i, DOCUMENTTYPE).toString());
+		}
+		
+		for (Iterator iterReq = requiredTypes.iterator(); iterReq.hasNext();) {
+			String reqType = (String) iterReq.next();
+			
+			for (Iterator iterUpl = uploadTypes.iterator(); iterUpl.hasNext();) {
+				String uplType = (String) iterUpl.next();
+				
+				if(reqType.equals(uplType)){
+					break;
+				}
+				
+				if(!iterUpl.hasNext())
+					return false;
+			}			
+		}		
+		return true;		
+	}

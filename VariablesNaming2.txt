@@ -1,0 +1,121 @@
+6.1.
+	//было
+	private getInsuranceInfo(){
+		//...
+		CBCurrency amount;
+		//...
+	}	
+	//стало
+	private getInsuranceInfo(){
+		//...
+		CBCurrency insuranceAmount;
+		//...
+	}
+	
+	//было
+	String getCollateralValue(CBBag inBag){
+		//...
+		CBCurrency sum;		
+		//...
+	}	
+	//стало
+	String getCollateralValue(CBBag inBag){	
+		//...		
+		CBCurrency totalCollateral;
+		//...
+	}
+	
+	//было
+	public CBBag doLoanSales(CBBag inBag) {
+		//...
+		CBCurrency balance;
+		//...
+	}	
+	//стало
+	public CBBag doLoanSales(CBBag inBag) {
+		//...
+		CBCurrency overdueAccBalance;
+		//...
+	}
+
+	//было	
+	public static String prepareAccountExplanation(CBBag inBag) throws CBException {
+		//...
+		String name;
+		//...
+	}	
+	//стало	
+	public static String prepareAccountExplanation(CBBag inBag) throws CBException {
+		//...
+		String accExplanation;
+		//...
+	}
+
+	//было		
+	private static void overwriteCustomerAccountByPartner(CBBag bag){
+		//...	
+		CBID account = CBIDFactory.newID(acc, CBIDFactory.ID_TYPE_ACCOUNT);
+		//...		
+	}
+	//стало		
+	private static void overwriteCustomerAccountByPartner(CBBag bag){
+		//...	
+		CBID custAccountNumber = CBIDFactory.newID(acc, CBIDFactory.ID_TYPE_ACCOUNT);
+		//...		
+	}
+	
+6.2
+	RequestFactory requestFatory;//фабрика для создания запросов разного типа
+	int LuhnCheckNum; // контрольная цифра, вычисленная по алгоритму Луна
+	char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };//массив 16-ричных цифр
+	SignatureStrategy strategy;//объект класса выбора типа электронной подписи
+	
+6.3.
+	//адрес клиента
+	public class Adress{
+		private String type;
+		private String ownership;
+		private CBDate startDate;
+		private String country;
+		private String region;
+		private String district;
+		private String city;
+		private String locality;
+		private String streetType;
+		private String street;
+		private String building;
+		private String flat;
+		private String house;
+		private String index;
+		private String comment;		
+		private String FIAS;
+		private String KLADR;
+		...
+	}
+	//паспорт клиента
+	public class Identity{	
+		private String type;
+		private String series;
+		private String number;
+		private CBDate issueDate;
+		private CBDate maturityDate;
+		private String issueUnit;
+		private String issueCountry;
+		private String issuePlace;
+		...
+	}
+	//запрос кредитного брокера
+	public class Request{
+		private Broker broker;
+		private String id;
+		private String usercode;
+		private String type;
+		private String date;
+		...
+	}
+6.4. 
+	String customerResidencyStatus - String customerResidency //резидентство клиента
+	String orgRegistrationAddress  - String orgRegAddress //адрес регистрации организации
+	String insurancePremiumRateString - String insPremiumRate //страховая премия %
+	CBCurrency balanceOfLoanReservationAccount - CBCurrency balanceOfLoanResAcc //баланс счета резерва на основной долг
+	CBCurrency collectedRestructuredIOandOIPenalty - CBCurrency collectedRIPenalty //погашенные пени на рассроченные проценты

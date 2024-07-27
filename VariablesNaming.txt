@@ -1,0 +1,23 @@
+CBBag tempBag - CBBag actionBag = CBCaller.call("CRED_GET_ACTION", ...); // CBBag - используемая на проекте структура на основе HashMap для передачи контекста между методами. В данном случае она заполняется данными акции из базы данных.
+
+CBBag tempBag - CBBag tariffBag = CBCaller.call("CRED_GET_CREDIT_TARIFF", ...); //данные тарифа из базы данных.
+
+int a = arr1[i]; - int letterCharCode = inputString.charAt(i); // i-тый элемент массива букв для выбора только кириллических символов
+
+String result - String identityTypeName // название типа документа, идетифицирующего личность, из справочника
+
+String str  - String amountString = amount.toString(); //значение суммы, преобразованное в строку
+
+curString  - irrWrittenAmount.append(amount.toString()); // внутренняя норма доходности текстом для печатного документа
+
+int size - int customerAddressesCount = inBag.getSize(ADDRESS);// количество адресов клиента
+
+String number = tmpBag.get(NUMBER).toString(); - String accountNumber = accountBag.get(NUMBER).toString();// номер счета
+
+String strTmp - String passportIssuingAuthority = custBag.get(ISSUINGPLACE).toString();//орган, выдавший паспорт клиента
+
+String tel - String phoneFullNumber = inBag.get(TELEPHONE, i, FIELDCODE).toString() + " " + inBag.get(TELEPHONE, i, TELEPHONENO).toString();//номер телефона клиента
+
+CBCurrency sum 	- CBCurrency loanAmount = getLoanAmountDependingOnAgreementType(agreementType, ...) // сумма кредита
+
+CBCurrency value - CBCurrency reserveCalculationCoefficient = getExchangeRate(inBag).multiply(riskRate).multiply(collCoefficient).divide(hundred);//коэффициент для вычисления суммы резерва

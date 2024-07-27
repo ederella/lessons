@@ -1,0 +1,307 @@
+// название переменных скоринга
+private static CBBag readOneFactorRequest(long queryId) throws CBException {
+		...
+		try{
+			int i = 0;
+			pom.readByQueryId(queryId);
+			while(pom.next()){
+				
+				data = pom.getMegafonBureauRequestPOMData();
+				outBag.put(TRANSACTIONTABLE, i, NAME, data.variableName);//Results.CB.Megafon.Variables.Name
+				i++;
+			}
+			outBag.put(BRANCHCOUNT, i);
+		}catch (CBException e){
+		...
+	}		
+}
+
+
+...
+		scoreBag.put(CREDITCARDINFORMATION, j, OVERDUEAMOUNT, 	amountOverdue.setScale(2, CBCurrency.ROUND_HALF_UP));				//CH.DTI.Cards.AmountOverdue
+			scoreBag.put(CREDITCARDINFORMATION, j, CREDITDEBT, 	  	currentDebt.setScale(2, CBCurrency.ROUND_HALF_UP));					//CH.DTI.Cards.CurrentDebt
+			scoreBag.put(CREDITCARDINFORMATION, j, NUMBER0, 		missedDaysCurrent);													//CH.DTI.Cards.MissedDaysCurrent
+			scoreBag.put(CREDITCARDINFORMATION, j, PRINCIPALAMOUNT,	principalAmount.setScale(2, CBCurrency.ROUND_HALF_UP));				//CH.DTI.Cards.PrincipalAmount
+			scoreBag.put(CREDITCARDINFORMATION, j, TOTALOVERDUEPRINCIPAL, principalAmountOverdue.setScale(2, CBCurrency.ROUND_HALF_UP));//CH.DTI.Cards.PrincipalAmountOverdue
+			
+			j++;			
+		}
+		scoreBag.put(TOTALCOUNT, j);	//CH.DTI.Cards
+...
+
+
+
+//1 - было
+
+...
+// collect periodic commission if exists			
+			CBCurrency periodicComissionAmount = planBag.get(PAYMENTPLAN,num,PERIODICCOMISSION).toCBCurrency();
+			if(!securitized && periodicComissionAmount != null && periodicComissionAmount.compare(CBCurrency.ZERO)>0)
+			{
+				
+				CBBag indivBag = Utility.isIndividualProvisionAndHasReservation(accBag, "PC");
+				long accountOid47423Individual = indivBag.existsBagKey(ACCOUNT_)? indivBag.get(ACCOUNT_).toSimpleLong() : 0L;
+				bookkeepPeriodicCommForOffBalance(accBag, periodicComissionAmount, exchRate, accountOid47423Individual);
+				
+				CBBag appearBag = CBBagFactory.createBag();
+				appearBag.put(CREDITOID, hesapBag.get(CREDITOID));
+				appearBag.put(COLLECTIONAMOUNT, periodicComissionAmount);
+				CBCaller.call("CRED_COMM_APPEAR_COLLECT", appearBag);
+				
+				explanationBag.clear();
+				explanationBag.put(CREDITREFERRENCE, creditRefference);
+				explanationBag.put(OPERATIONDATE, today);
+				explanationBag.put(ID, 363);
+
+				if(accountOid47423Individual > 0L)
+				{
+					transferOut(MFSE_DRAWER, periodicComissionAmount, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+					creditAccount(MFSE_DRAWING, accountOid47423Individual, periodicComissionAmount, periodicComissionAmount.multiply(exchRate), CBSessionInfo.getCurrentUrunIslemRefNo(), exchangeCode, explanationBag);
+				}
+				else
+				{
+					transferOut(MFSE_ACC_COMMISSION, periodicComissionAmount, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+					transferGL(MFSE_ACC_COMMISSIONR, periodicComissionAmount, accBag);
+				}
+			}
+			amount = amount.subtract(periodicComissionAmount);
+			secCommission = secCommission.add(periodicComissionAmount);
+...
+
+
+//1- стало
+
+...
+			CBCurrency periodicComissionAmount = planBag.get(PAYMENTPLAN,num,PERIODICCOMISSION).toCBCurrency();
+
+			if(!securitized && periodicComissionAmount != null && periodicComissionAmount.compare(CBCurrency.ZERO)>0)
+			{				
+				collectPriosicComission(exchRate, accBag, explanationBag, periodicComissionAmount);
+			}
+			amount = amount.subtract(periodicComissionAmount);
+			secCommission = secCommission.add(periodicComissionAmount);
+...
+
+	private void collectPriosicComission(CBCurrency exchRate, CBBag accBag, CBBag explanationBag, CBCurrency periodicComissionAmount) throws CBException {
+		CBBag indivBag = Utility.isIndividualProvisionAndHasReservation(accBag, "PC");
+		long accountOid47423Individual = indivBag.existsBagKey(ACCOUNT_)? indivBag.get(ACCOUNT_).toSimpleLong() : 0L;
+		bookkeepPeriodicCommForOffBalance(accBag, periodicComissionAmount, exchRate, accountOid47423Individual);
+		
+		CBBag appearBag = CBBagFactory.createBag();
+		appearBag.put(CREDITOID, hesapBag.get(CREDITOID));
+		appearBag.put(COLLECTIONAMOUNT, periodicComissionAmount);
+		CBCaller.call("CRED_COMM_APPEAR_COLLECT", appearBag);
+		
+		explanationBag.clear();
+		explanationBag.put(CREDITREFERRENCE, creditRefference);
+		explanationBag.put(OPERATIONDATE, today);
+		explanationBag.put(ID, 363);
+
+		if(accountOid47423Individual > 0L)
+		{
+			transferOut(MFSE_DRAWER, periodicComissionAmount, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+			creditAccount(MFSE_DRAWING, accountOid47423Individual, periodicComissionAmount, periodicComissionAmount.multiply(exchRate), CBSessionInfo.getCurrentUrunIslemRefNo(), exchangeCode, explanationBag);
+		}
+		else
+		{
+			transferOut(MFSE_ACC_COMMISSION, periodicComissionAmount, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+			transferGL(MFSE_ACC_COMMISSIONR, periodicComissionAmount, accBag);
+		
+	
+	
+	
+	
+//2-было
+
+...
+	            //calculate IRR
+	            if(inBag.existsBagKey(TOTALAMOUNT1))
+	            {
+	        	    bag.put(TOTALAMOUNT1, inBag.get(TOTALAMOUNT1).toString());
+	        	    bag.put(VALUEBALANCE,getCurrencyString2(inBag.get(VALUEBALANCE).toCBCurrency(),inBag.get(EXCHANGECODE).toString().trim()));
+    				if(CBSessionInfo.getKanalKodu().equals(CHANNEL_CALL_CENTER))
+    				{
+    					bag.put(TEXT1, inBag.get(VALUEBALANCE).toString());
+    				}
+	            }else
+	            {
+	        	    CBBag creditBag = CBCaller.call("CRED_GET_RETAILLOAN_INFO", CBBagFactory.createBag().put(CREDITOID,inBag.get(CREDITOID)));
+	        	    CBBag irrInfoBag = CBBagFactory.createBag();
+    				inBag.copyTo(irrInfoBag);
+    				irrInfoBag.put(VALUEDATE2, creditBag.get(CREDITDATE));
+    				irrInfoBag.put(CREDITTYPE, creditBag.get(CREDITTYPE));
+    				irrInfoBag.put(CREDITSUM, creditBag.get(AVAILMENTSUM));
+    				irrInfoBag.put(TOTALCOST, (!creditBag.existsBagKey(TOTALCOST)|| creditBag.get(TOTALCOST)==null || creditBag.get(TOTALCOST).toCBCurrency()==null || creditBag.get(TOTALCOST).toCBCurrency().compare(CBCurrency.ZERO)<=0)?creditBag.get(AVAILMENTSUM):creditBag.get(TOTALCOST));
+    				irrInfoBag.put(ACCRUEDINTEREST, creditBag.get(ACCRUEDINTEREST));
+    				CBCurrency irrComm = CBCurrency.ZERO;
+    				if(creditBag.existsBagKey(COMMISSIONAMOUNT) && creditBag.get(COMMISSIONAMOUNT)!=null && creditBag.get(COMMISSIONAMOUNT).toCBCurrency().compare(CBCurrency.ZERO)>0)
+    					irrComm = irrComm.add(creditBag.get(COMMISSIONAMOUNT).toCBCurrency());
+    				if(creditBag.existsBagKey(FIXEDCOMMISSIONAMOUNT) && creditBag.get(FIXEDCOMMISSIONAMOUNT)!=null && creditBag.get(FIXEDCOMMISSIONAMOUNT).toCBCurrency().compare(CBCurrency.ZERO)>0)
+    					irrComm = irrComm.add(creditBag.get(FIXEDCOMMISSIONAMOUNT).toCBCurrency());
+    				irrInfoBag.put(TOTALCOMMISSION, irrComm);
+    				irrInfoBag.put(INDEX, getRowNumForNextCollectionDate(inBag));
+    				CBBag irrBag = CBCaller.call("CRED_GET_IRR_FORDOCUMENT", irrInfoBag);
+    				bag.put(TOTALAMOUNT1, irrBag.get(VALUE).toString());
+                     //ticket #43112
+    				bag.put(VALUEBALANCE,getCurrencyString2(irrBag.get(VALUEBALANCE).toCBCurrency(),inBag.get(EXCHANGECODE).toString().trim()));
+    				//bag.put(VALUEBALANCE, irrBag.get(VALUEBALANCE).toCBCurrency().format(20, 2).toString().trim() + " " + (inBag.get(EXCHANGECODE).toString().equals("RUB") ? getRBValue("CRD_RUBLE_5_MORE", true) : getRBValue("CRD_DOLLAR_5_MORE", true)));
+    				if(CBSessionInfo.getKanalKodu().equals(CHANNEL_CALL_CENTER))
+    				{
+    					bag.put(TEXT1, irrBag.get(VALUEBALANCE).toCBCurrency().format(20, 2).toString().trim());
+    				    				}
+	            }
+...
+
+
+//2-стало
+
+private static void calculateIRR(CBBag inBag, CBBag bag) throws CBException {
+		if (inBag.existsBagKey(TOTALAMOUNT1)) {
+			bag.put(TOTALAMOUNT1, inBag.get(TOTALAMOUNT1).toString());
+			bag.put(VALUEBALANCE, getCurrencyString2(inBag.get(VALUEBALANCE).toCBCurrency(), inBag.get(EXCHANGECODE).toString().trim()));
+			if (CBSessionInfo.getKanalKodu().equals(CHANNEL_CALL_CENTER)) {
+				bag.put(TEXT1, inBag.get(VALUEBALANCE).toString());
+			}
+			return;
+		}
+		
+		CBBag creditBag = CBCaller.call("CRED_GET_RETAILLOAN_INFO", CBBagFactory.createBag().put(CREDITOID, inBag.get(CREDITOID)));
+		CBBag irrInfoBag = CBBagFactory.createBag();
+		inBag.copyTo(irrInfoBag);
+		irrInfoBag.put(VALUEDATE2, creditBag.get(CREDITDATE));
+		irrInfoBag.put(CREDITTYPE, creditBag.get(CREDITTYPE));
+		irrInfoBag.put(CREDITSUM, creditBag.get(AVAILMENTSUM));
+		irrInfoBag.put(TOTALCOST, (!creditBag.existsBagKey(TOTALCOST) || creditBag.get(TOTALCOST) == null || creditBag.get(TOTALCOST).toCBCurrency() == null || creditBag.get(TOTALCOST).toCBCurrency().compare(
+				CBCurrency.ZERO) <= 0) ? creditBag.get(AVAILMENTSUM) : creditBag.get(TOTALCOST));
+		irrInfoBag.put(ACCRUEDINTEREST, creditBag.get(ACCRUEDINTEREST));
+		CBCurrency irrComm = CBCurrency.ZERO;
+		if (creditBag.existsBagKey(COMMISSIONAMOUNT) && creditBag.get(COMMISSIONAMOUNT) != null && creditBag.get(COMMISSIONAMOUNT).toCBCurrency().compare(CBCurrency.ZERO) > 0)
+			irrComm = irrComm.add(creditBag.get(COMMISSIONAMOUNT).toCBCurrency());
+		if (creditBag.existsBagKey(FIXEDCOMMISSIONAMOUNT) && creditBag.get(FIXEDCOMMISSIONAMOUNT) != null && creditBag.get(FIXEDCOMMISSIONAMOUNT).toCBCurrency().compare(CBCurrency.ZERO) > 0)
+			irrComm = irrComm.add(creditBag.get(FIXEDCOMMISSIONAMOUNT).toCBCurrency());
+		irrInfoBag.put(TOTALCOMMISSION, irrComm);
+		irrInfoBag.put(INDEX, getRowNumForNextCollectionDate(inBag));
+		CBBag irrBag = CBCaller.call("CRED_GET_IRR_FORDOCUMENT", irrInfoBag);
+		
+		bag.put(TOTALAMOUNT1, irrBag.get(VALUE).toString());
+		bag.put(VALUEBALANCE, getCurrencyString2(irrBag.get(VALUEBALANCE).toCBCurrency(), inBag.get(EXCHANGECODE).toString().trim()));
+
+		if (CBSessionInfo.getKanalKodu().equals(CHANNEL_CALL_CENTER)) {
+			bag.put(TEXT1, irrBag.get(VALUEBALANCE).toCBCurrency().format(20, 2).toString().trim());
+		}
+	}
+	
+
+//3-было
+...
+				//get user name
+				CBBag userBag = CBBagFactory.createBag();
+				userBag.put(KULLANICIKODU, rs.getString("ENTRYUSER"));
+				userBag = CBCaller.call("ORG_KULLANICI_GETIR", userBag);
+				
+				outBag.put(TABLE1, i, NAMESURNAME, userBag.get(SURNAME_).toString() + " " + userBag.get(NAMEA).toString() + " " + 
+						userBag.get(SECONDNAME).toString());
+				
+...
+//3-стало
+...
+	outBag.put(TABLE1, i, NAMESURNAME, getUserName(rs.getString("ENTRYUSER")));
+...
+
+	private static String getUserName(String userCode) throws CBException {
+		CBBag userBag = CBBagFactory.createBag();
+		userBag.put(KULLANICIKODU, userCode);
+		userBag = CBCaller.call("ORG_KULLANICI_GETIR", userBag);
+		return userBag.get(SURNAME_).toString() + " " + userBag.get(NAMEA).toString() + " " + userBag.get(SECONDNAME).toString();
+	}
+
+	
+	
+//4-было
+
+...
+			if(isEmailSending){
+			
+			//get customer e-mail address
+			CBBag custBag = CBBagFactory.createBag();
+			custBag.put(CUSTOMERNUMBER, custNo);
+			
+			custBag = CBCaller.call("CUST_GET_CUSTOMER_RU", custBag);
+			
+			String emailAddress = null;
+			int internetCount = custBag.getSize(INTERNET);
+			
+			for(int i = 0; i < internetCount; i++){
+				
+				if(custBag.get(INTERNET, i, ADDRESSTYPE).toString().equals(INTERNET_TYPE_HOME_MAIL)){
+					emailAddress = custBag.get(INTERNET, i, ADDRESS).toString();
+					break;
+				}
+			}
+			
+			//if e-mail address is found
+			if(emailAddress != null){
+				...
+			}
+			}
+...
+
+//4-стало
+...
+			if(isEmailSending){
+				String emailAddress = getEmailAddress(custNo);
+
+				//if e-mail address is found
+				if(emailAddress.length() > 0){
+					...
+				}
+			}
+...
+
+	private static String getEmailAddress(String custNo) throws CBException {
+		CBBag custBag = CBBagFactory.createBag();
+		custBag.put(CUSTOMERNUMBER, custNo);		
+		custBag = CBCaller.call("CUST_GET_CUSTOMER_RU", custBag);
+		int internetCount = custBag.getSize(INTERNET);		
+		for(int i = 0; i < internetCount; i++){
+			
+			if(custBag.get(INTERNET, i, ADDRESSTYPE).toString().equals(INTERNET_TYPE_HOME_MAIL)){
+				return custBag.get(INTERNET, i, ADDRESS).toString();
+			}
+		}
+		return "";
+	}
+
+
+//5-было
+			//collect first installment
+			explanationBag.clear();
+			explanationBag.put(CREDITREFERRENCE, creditRefference);
+			explanationBag.put(OPERATIONDATE, today);
+			explanationBag.put(ID, 417);
+			CBCurrency firstInstallment = planBag.get(PAYMENTPLAN,num,CAPITALTOBESUBTRACTED).toCBCurrency();
+			if(!securitized && firstInstallment.compare(CBCurrency.ZERO)>0){
+				transferOut(MFSE_CURRENTACCOUNT_D, firstInstallment, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+				transferIn(MFSE_CUSTOMER, firstInstallment, null, creditBag.get(ACCOUNTOID), accBag, explanationBag);
+				amount = amount.subtract(firstInstallment);
+			}
+
+//5-стало
+	...
+	CBCurrency collectedAmount = collectFirstInstallment(securitized, num, accBag);
+	amount = amount.subtract(collectedAmount);	
+	...
+
+	private CBCurrency collectFirstInstallment(boolean securitized, int num, CBBag accBag) throws CBException {
+		CBBag explanationBag = CBBagFactory.createBag();
+		explanationBag.put(CREDITREFERRENCE, creditRefference);
+		explanationBag.put(OPERATIONDATE, today);
+		explanationBag.put(ID, 417);
+		CBCurrency firstInstallment = planBag.get(PAYMENTPLAN,num,CAPITALTOBESUBTRACTED).toCBCurrency();
+		if(!securitized && firstInstallment.compare(CBCurrency.ZERO)>0){
+			transferOut(MFSE_CURRENTACCOUNT_D, firstInstallment, hesapBag.get(CUSTOMERACCOUNT), accBag, explanationBag);
+			transferIn(MFSE_CUSTOMER, firstInstallment, null, creditBag.get(ACCOUNTOID), accBag, explanationBag);
+			return firstInstallment;
+		}
+		return CBCurrency.ZERO;
+	}

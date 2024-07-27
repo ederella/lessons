@@ -1,0 +1,77 @@
+//1.
+//было 
+double averageDayDifference = getAverageDayDiff(inBag, startIndex);
+//стало
+double dayDiffAverage = getAverageDayDiff(inBag, startIndex);		
+
+//2.
+//было 
+double averageMonitoringsPerDay = (double) numberOfMonitorings / (double) numberOfMonthWorkingDays;
+//стало
+double monitoringsAverage = (double) monitoringsCount / (double) monthWorkDaysCount;
+
+//3.
+//было 
+int maxDayDiffRate = ((Integer)Collections.max(dayDiffRates.values())).intValue();
+//стало
+int dayDiffRateMax = ((Integer)Collections.max(dayDiffRates.values())).intValue();
+
+//4.
+//было 
+int maxPaymentNo// номер последнего платежа в графике платежей
+//стало
+int installmentsCount
+
+//5.
+//было		
+CBCurrency maxCommision = commissionBag.get(MAXSUM).toCBCurrency() != null ? commissionBag.get(MAXSUM).toCBCurrency() : CBCurrency.ZERO; //максимальная сумма комиссии
+CBCurrency minCommision = commissionBag.get(MINIMUMAMOUNT).toCBCurrency() != null ? commissionBag.get(MINIMUMAMOUNT).toCBCurrency() : CBCurrency.ZERO; //минимальная сумма комиссии
+//стало
+CBCurrency сommisionMax = commissionBag.get(MAXSUM).toCBCurrency() != null ? commissionBag.get(MAXSUM).toCBCurrency() : CBCurrency.ZERO;
+CBCurrency commisionMin = commissionBag.get(MINIMUMAMOUNT).toCBCurrency() != null ? commissionBag.get(MINIMUMAMOUNT).toCBCurrency() : CBCurrency.ZERO;
+
+//6.
+//было		
+	String docList = ""; //список документов для печати
+//стало		
+	String printedDocs = ""; //список документов для печати
+	
+//7.
+//было
+	private Vector getPhones(String[]types){
+			Vector list = new Vector();
+	...}
+//стало
+	private Vector getPhones(String[]types){
+			Vector phones = new Vector();
+	...}
+	
+//8.
+//было
+	StringBuffer equipmentsList = new StringBuffer();//список доп.оборудования по автокредиту
+//стало
+	StringBuffer equipments = new StringBuffer();
+	
+//9.
+//было
+	CBBag addServList = AdditionalService.getCreditAdditionalServiceList(creditOid); //данные по дополнительным услугам по кредиту
+//стало
+	CBBag addServBag = AdditionalService.getCreditAdditionalServiceList(creditOid);
+	
+//10.
+//было
+	String[] phoneList = new String[custPhoneCount];
+//стало
+	String[] phones = new String[custPhoneCount];
+
+//11.
+//было
+	CBCurrency totalPenalty // общая сумма пеней
+//стало
+	CBCurrency penaltyTotal
+
+//12.
+//было
+	CBCurrency totalInterest //общая сумма процентов
+//стало
+	CBCurrency interestTotal
