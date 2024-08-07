@@ -35,7 +35,7 @@ public class PowerSet<T> extends AbstractPowerSet<T>{
 	@Override
 	public void put(T t) {
 		putStatus = PUT_STATUS_ERR;
-		if(isMaxReached() || find(t) != -1)
+		if (find(t) != -1)
 			return;
 		
 		int freeSlotIdx = findSlot(t);
@@ -113,19 +113,48 @@ public class PowerSet<T> extends AbstractPowerSet<T>{
 		return count;
 	}
 
+
 	@Override
-	public boolean existsValue(T value) {
-		for(int i = 0; i < slots.length; i++) {
-			if(slots[i].equals(value))
-				return true;
+	public AbstractPowerSet<T> intersection(AbstractPowerSet<T> set) {
+		ArrayList<T> al= new ArrayList<>();
+		for(int i = 0; i < slots.length ; i++) {
+			if(set.find(slots[i]) != -1) {
+				al.add(slots[i]);
+			}				
+		}
+		return new PowerSet<T>(al.size(),this.step, this.clazz);
+	}
+
+	@Override
+	public AbstractPowerSet<T> union(AbstractPowerSet<T> set) {
+		ArrayList<T> al= new ArrayList<>();
+		for(int i = 0; i < slots.length ; i++) {
+				if(!al.contains(slots[i]))
+					al.add(slots[i]);
+			}				
+		return new PowerSet<T>(al.size(),this.step, this.clazz);
+	}
+
+	@Override
+	public AbstractPowerSet<T> difference(AbstractPowerSet<T> set) {
+		ArrayList<T> al= new ArrayList<>();
+		for(int i = 0; i < slots.length ; i++) {
+				if(set.find(slots[i]) == -1) {
+					al.add(slots[i]);
+				}	
+			}				
+		return new PowerSet<T>(al.size(),this.step, this.clazz);
+	}
+
+	@Override
+	public boolean isSubset(AbstractPowerSet<T> set) {
+		for(int i = 0; i < slots.length ; i++) {
+			if(set.find(slots[i]) != -1)
+				return true;			
 		}
 		return false;
 	}
 
-	@Override
-	public boolean isMaxReached() {
-		return count == slots.length;
-	}
 
 
 }
