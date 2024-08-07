@@ -13,58 +13,77 @@ public class PowerSet<T> extends AbstractPowerSet<T>{
 	public static final int PUT_STATUS_OK = 1;
 	public static final int PUT_STATUS_ERR = 2;
 	
-	private ArrayList<T> set;
+	private int size;
+	private int count;
+	private int step;
+	public T[] slots;
+	Class clazz;
 	private int putStatus;
 	private int removeStatus;
-	private Class clz;
 	
-	public PowerSet(Class clz) {
-		set = new ArrayList<>();
-		this.clz = clz;
+
+	public PowerSet(int sz, int stp, Class clz) {
+		size = sz;
+		step = stp;
+		clazz = clz;
+		slots = (T[]) Array.newInstance(this.clazz, size);
+
+		for (int i = 0; i < size; i++)
+			slots[i] = null;
 	}
+	
 	@Override
-	public void put(T value) {
-		if(!existsValue(value)) {
-			putStatus = PUT_STATUS_OK;
-			set.add(value);
-			return;
-		}
+	public void put(T t) {
 		putStatus = PUT_STATUS_ERR;
-	}
-
-	@Override
-	public void remove(T value) {
-		if(existsValue(value)) {
-			removeStatus = REMOVE_STATUS_OK;
-			set.remove(value);
+		if(isMaxReached() || find(t) != -1)
 			return;
+		
+		int freeSlotIdx = findSlot(t);
+		if (freeSlotIdx != -1) {
+			slots[freeSlotIdx] = t;
+			putStatus = PUT_STATUS_OK;
+			count++;
 		}
-		removeStatus = REMOVE_STATUS_ERR;
+
+	}
+
+	
+	private int findSlot(T t) {
+		int slotIdx = hashFun(t);
+
+		for(int i = slotIdx;;){
+			if (slots[i] == null) {
+				return i;
+			}
+			i = (i + step) % size;
+			
+			if(i == slotIdx)
+				break;
+		}
+		return -1;
 	}
 
 	@Override
-	public boolean existsValue(T value) {
-		for(int i = 0; i < set.size(); i++) {
-			if(set.get(i).equals(value))
-				return true;
-		}
-		return false;
+	public int find(T t) {
+		int slotIdx = hashFun(t);
+
+		for(int i = slotIdx;;){
+			if (slots[i] == t)
+				return i;
+			
+			i = (i + step) % size;
+			
+			if(i == slotIdx)
+				break;
+		}		
+		return -1;
 	}
 
 	@Override
-	public int size() {
-		return set.size();
+	public int hashFun(T t) {
+		return t.toString().length() % size;
 	}
 
-	@Override
-	public boolean isSubset(AbstractPowerSet<T> set2) {
-		T[] set2Values = set2.toArray();
-		for(int i = 0; i < set2Values.length; i++) {
-			if(!existsValue(set2Values[i]))
-				return false;
-		}
-		return true;
-	}
 
 	@Override
 	public int getPutStatus() {
@@ -75,11 +94,38 @@ public class PowerSet<T> extends AbstractPowerSet<T>{
 	public int getRemoveStatus() {
 		return removeStatus;
 	}
+
 	@Override
-	public T[] toArray() {
-		T[] arr = (T[]) Array.newInstance(this.clz, size());
+	public void remove(T t) {
+		int slot = find(t);
+		if(slot!=-1) {
+			slots[slot] = null;
+			removeStatus = REMOVE_STATUS_OK;
+			count--;
+		}
+		if(slot==-1)
+			removeStatus = PUT_STATUS_ERR;
 		
-		return set.toArray(arr);
 	}
+
+	@Override
+	public int size() {
+		return count;
+	}
+
+	@Override
+	public boolean existsValue(T value) {
+		for(int i = 0; i < slots.length; i++) {
+			if(slots[i].equals(value))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isMaxReached() {
+		return count == slots.length;
+	}
+
 
 }

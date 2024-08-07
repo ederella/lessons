@@ -1,9 +1,11 @@
 package ooap1.set;
 
-public abstract class AbstractPowerSet<T> {
+import ooap1.hashTable.AbstractHashTable;
+
+public abstract class AbstractPowerSet<T> extends AbstractHashTable<T>{
 	
 	//команды:
-	//предусловие: элемента нет во множестве
+	//предусловие: максимум не достигнут и элемента нет во множестве
 	//постусловие: элемент есть во множестве
 	public abstract void put(T value);
 	
@@ -14,12 +16,8 @@ public abstract class AbstractPowerSet<T> {
 	//запросы:
 	public abstract boolean existsValue(T value);
 	
-	public abstract int size();
+	public abstract boolean isMaxReached();
 
-	public abstract T[] toArray();
-	
-	public abstract boolean isSubset(AbstractPowerSet<T> set2);
-	
 	//запросы статусов
 	public abstract int getPutStatus();//ok, элемент есть во множестве
 	public abstract int getRemoveStatus();//ok, элемента нет во множестве
