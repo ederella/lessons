@@ -8,10 +8,6 @@ public abstract class AbstractBloomFilter {
 	public abstract void add(String str1);
 	
 	
-	//запросы
-	public abstract int hash1(String str1);
-	
-	public abstract int hash2(String str1);
-	
+	//запросы	
 	public abstract boolean isValue(String str1);
 }
