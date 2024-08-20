@@ -1,0 +1,4 @@
+1) С эталонным совпали методы get, append и remove (пост- и предусловия совпали)
+2) Нужно было добавить методы put, put_left, put_right и size
+3) Не нужны методы insert и makeArray
+

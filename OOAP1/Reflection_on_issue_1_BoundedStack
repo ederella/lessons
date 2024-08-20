@@ -1,0 +1,144 @@
+Разбор 1 задания Bounded Stack:
+
+Ошибки:
+ 	1) Сделала сразу реализацию, а нужно было просто абстрактный класс 
+ 	2) Не написала комментарии про предусловие и постусловие
+ 	3) Не разделила методы на команды и запросы
+
+
+Мое решение
+	public class BoundedStack<T> {
+	// скрытые поля
+	private List<T> stack; // основное хранилище стека
+	private int peekStatus; // статус запроса peek()
+	private int popStatus; // статус команды pop()
+	private int pushStatus; // статус команды push()
+	private final int maxSize;
+
+	// интерфейс класса, реализующий АТД Stack
+	public static final int POP_NIL = 0;
+	public static final int POP_OK = 1;
+	public static final int POP_ERR = 2;
+
+	public static final int PEEK_NIL = 0;
+	public static final int PEEK_OK = 1;
+	public static final int PEEK_ERR = 2;
+
+	public static final int PUSH_NIL = 0;
+	public static final int PUSH_OK = 1;
+	public static final int PUSH_ERR = 2;
+
+	public static final int DEFAULT_SIZE = 32;
+
+	
+	public BoundedStack() {
+		this(DEFAULT_SIZE);
+	}
+
+	public BoundedStack(int maxSize) {
+		this.stack = new ArrayList<>(maxSize);
+		this.maxSize = maxSize;
+		this.peekStatus = PEEK_NIL;
+		this.popStatus = POP_NIL;
+		this.pushStatus = PUSH_NIL;
+	}
+
+	public void push(T value) {
+		if (size() < maxSize) {
+			stack.add(value);
+			pushStatus = PUSH_OK;
+		} else {
+			pushStatus = PUSH_ERR;
+		}
+	}
+
+	public void pop() {
+		int size = size();
+		if (size > 0) {
+			stack.remove(size - 1);
+			popStatus = POP_OK;
+		} else
+			popStatus = POP_ERR;
+	}
+
+	public void clear() {
+		stack.clear();
+		peekStatus = PEEK_NIL;
+		popStatus = POP_NIL;
+	}
+
+	public T peek() {
+		int size = size();
+		if (size > 0) {
+			peekStatus = PEEK_OK;
+			return stack.get(size - 1);
+		}
+		popStatus = PEEK_ERR;
+		return null;
+	}
+
+	public int size() {
+		return stack.size();
+	}
+
+	// запросы статусов
+	public int getPopStatus() {
+		return popStatus;
+	}
+
+	public int getPeekStatus() {
+		return peekStatus;
+	}
+
+	public int getPushStatus() {
+		return pushStatus;
+	}
+}
+
+
+Эталонное решение:
+abstract class BoundedStack<T>
+
+    public const int POP_NIL = 0; // push() ещё не вызывалась
+    public const int POP_OK = 1; // последняя pop() отработала нормально
+    public const int POP_ERR = 2; // стек пуст
+
+    public const int PEEK_NIL = 0; // push() ещё не вызывалась
+    public const int PEEK_OK = 1; // последняя peek() вернула корректное значение 
+    public const int PEEK_ERR = 2; // стек пуст
+
+    public const int PUSH_OK = 1; // последняя push() отработала нормально
+    public const int PUSH_ERR = 2; // в стеке нет свободного места 
+
+    // конструктор
+// постусловие: создан новый пустой стек
+    public BoundedStack<T> BoundedStack(int max_size);
+
+
+    // команды:
+// предусловие: в стеке менее максимального кол-ва элементов
+// постусловие: в стек добавлено новое значение
+    public void push(T value); 
+
+// предусловие: стек не пустой; 
+// постусловие: из стека удалён верхний элемент
+    public void pop(); 
+
+// постусловие: из стека удалятся все значения
+    public void clear();
+
+
+    // запросы:
+// предусловие: стек не пустой
+    public T peek(); 
+
+    public int size();
+    public int max_size();
+
+    // дополнительные запросы:
+    public int get_pop_status(); // возвращает значение POP_*
+    public int get_peek_status(); // возвращает значение PEEK_*
+    public int get_push_status(); // возвращает значение PUSH_*
+
+
+

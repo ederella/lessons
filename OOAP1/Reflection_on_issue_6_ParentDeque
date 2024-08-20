@@ -1,0 +1,7 @@
+Расхождений с эталонным решением не выявлено, за исключением названий методов - я использовала 
+addFirst - вместо add_front
+removeFirst - вместо remove_front
+addLast - вместо add_tail
+removeLast - вместо remove_tail
+getFirst - вместо get_front
+getLast - вместо get_tail
