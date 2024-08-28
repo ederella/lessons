@@ -1,0 +1,44 @@
+public class Dancer{
+    String turnAround(){
+        return "Simple turn";
+    }
+}
+
+public class Ballerina extends Dancer{
+  @Override
+    String turnAround(){
+        return "Fouette!";
+    }
+}
+
+public class BreakDancer extends Dancer{
+    @Override
+    String turnAround(){
+        return "Headspin!";
+    }
+}
+
+public class FigureSkater extends Dancer{
+    @Override
+    String turnAround(){
+        return "Libela!";
+    }
+}
+
+public class Main{
+  public static void main(String... args){
+      Dancer eugenia = new Ballerina();
+      Dancer benny = new BreakDancer();
+      Dancer anna = new FigureSkater();
+      //внутри spin вызывается метод соответствующий классу объекта
+      spin(10, eugenia); //fouette
+      spin(25, benny);//headspin
+      spin(5, anna);//libela
+  }
+
+  public static void spin(int times, Dancer dancer){
+      for(int i = 0; i< times; i++){
+          System.out.println(dancer.turnAround());
+      }
+  }
+}
