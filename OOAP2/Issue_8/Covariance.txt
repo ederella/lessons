@@ -1,0 +1,26 @@
+public class Dancer{
+    String turnAround(){
+        return "Simple turn";
+    }    
+}
+
+public class FigureSkater extends Dancer{
+	@Override
+    String turnAround(){
+        return "Libela!";
+    }
+}
+
+public class SimpleCompetition {
+
+	public Dancer getChampion() {
+		return new Dancer();
+	}
+}
+
+public class FigureSkatingCompetition extends SimpleCompetition{
+	@Override
+	public FigureSkater getChampion() {
+		return new FigureSkater();//переопределенный метод возвращает наследника возвращаемого типа родительского метода
+	}
+}
