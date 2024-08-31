@@ -1,0 +1,21 @@
+public class TestA {
+	final String printA() {
+		return "A";
+	}
+	
+	String printB() {
+		return "B";
+	}
+}
+public class TestB extends TestA{
+
+	@Override
+	String printA() {//compilation error
+		return "A from TestB";
+	}
+	
+	@Override
+	String printB() {
+		return "B from TestB";
+	}
+}
