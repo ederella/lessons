@@ -104,12 +104,13 @@ public non-sealed class Any extends General {
 	}
 
 	@Override
-	int assignment_attempt(General target, Object source) {
-		if(source instanceof General) {
-			target = (General)source;
-			return 1;
+    <A extends Any, B extends Any> A assignment_attempt(A target, B source) {
+
+		if (source.getType().isAssignableFrom(target.getType())) {
+			return (A) source;
 		}
-		target = null;
-		return 0;
+		return null;
 	}
-}
+
+	
+	}

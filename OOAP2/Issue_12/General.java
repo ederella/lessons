@@ -20,7 +20,7 @@ public sealed abstract class General permits Any {
 	
 	abstract Class<?> getType();
 	
-	abstract int assignment_attempt(General target, Object source);
+	abstract <A extends Any, B extends Any> A assignment_attempt(A target, B source);
 
 
 }
