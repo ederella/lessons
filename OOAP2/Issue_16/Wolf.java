@@ -2,8 +2,8 @@ package main;
 
 public class Wolf {
 
-	Object sayName(Object name) {
-		Object result = ((String)name).toUpperCase();
+	Object sayName(String name) {
+		Object result = name.toUpperCase();
         return result;
 
 	}

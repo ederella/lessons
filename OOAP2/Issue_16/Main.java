@@ -18,13 +18,23 @@ public class Main {
 	
 		Wolf w = new Wolf();
 		Dog d = new Dog();
-		System.out.println(w.sayName("Wolf"));
-		System.out.println(d.sayName("Dog"));
-		w = d;
-		System.out.println(d.sayName("Dog"));
+		
+		Wolf[] ar = {w, d};
+		covariant(ar);
+		
+		polymorph(d);
 
 	}
 
 
+	public static <T extends Wolf> void covariant(T[] dogs) {
+		for(T val : dogs) {
+			System.out.println(val);
+		}		
+	}
+	
+	public static void polymorph(Wolf v) {
+		System.out.println(v.sayName("Bob"));
+	}
 
 }
