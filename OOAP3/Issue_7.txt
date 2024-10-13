@@ -1,0 +1,23 @@
+Отбираем итоговое множество классов, удаляя лишние (анализ) и формируем из них кластеры: объединяем классы как модули в логические группы (переход к проектированию).
+
+Модуль игры  
+  Game
+  GameField
+  GameCell
+  Grid
+  GameFieldObserver
+  GameFacade
+
+Модуль бонусов
+  BonusManager
+  BonusStrategy
+
+Модуль статистики
+  Statistics
+  History
+
+Модуль взаимодействия с пользователем
+  UserCommandObserver
+  UserCommand
+  ConsoleManager
+
