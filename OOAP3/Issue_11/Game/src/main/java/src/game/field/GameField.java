@@ -61,7 +61,8 @@ public class GameField {
 	public void proceedStep(GameStep step) {
 		this.stepScreens.clear();
 		cells.swap(step.getPos1(), step.getPos2());
-		proceedAfterStep();		
+		proceedAfterStep();
+		statistics.getPoints().addStep();
 	}
 	
 	public String printCells() {

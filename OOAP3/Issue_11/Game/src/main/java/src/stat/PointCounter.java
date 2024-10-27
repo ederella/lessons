@@ -14,6 +14,9 @@ public class PointCounter {
 
 	public void addPoints(int addValue) {
 		this.value += (bonusStrategy.recalc(addValue));
+	}
+	
+	public void addStep() {
 		this.stepCount++;
 	}
 	
