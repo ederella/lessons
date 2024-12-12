@@ -1,5 +1,5 @@
 // 16.1
-let notDivisible(m,n) = m % n = 0
+let notDivisible(m,n) = m % n <> 0
 
 // 16.2
 let rec check = function
