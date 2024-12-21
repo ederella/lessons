@@ -36,5 +36,6 @@ let (.*) x y =
 
 let (./) x y = 
     let (a, b) = y
-    let div_y = (a/(a*a + b*b),-b/(a*a + b*b))
-    x .* y
+    let coef = a*a + b*b
+    let div_y = (a/coef,-b/coef)
+    x .* div_y
