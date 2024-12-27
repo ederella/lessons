@@ -15,6 +15,6 @@ let rec dnto x =
 // 34.3
 let rec evenn x = 
     let rec evennfun = function
-        |(0, ls) -> 0::ls
-        |(x, ls) -> evennfun(x-1, (2*x)::ls)
+        |(0, ls) -> 0
+        |(x, ls) -> evennfun(x-1, (2*x-2)::ls)
     evennfun(x, [])
