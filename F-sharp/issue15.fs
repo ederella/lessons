@@ -9,7 +9,7 @@ let list_filter f xs =
 // 41.4.2
 let sum p xs = 
   let ff = fun x y ->
-    if f(x)
+    if p(x)
       then x + y 
     else x
   List.foldBack ff xs 0
