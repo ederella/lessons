@@ -4,7 +4,7 @@ let list_filter f xs =
   List.foldBack ff xs []
 
 // 41.4.2
-let sum p xs = 
+let sum(p,xs) = 
   let fp = fun x y -> if p(x) then x + y else y
   List.fold fp 0 xs
 
