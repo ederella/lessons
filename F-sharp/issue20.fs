@@ -4,8 +4,8 @@ let even_seq = Seq.initInfinite(fun x -> 2 * x + 2)
 // 49.5.2
 let fac_seq = Seq.initInfinite(let rec fac x = 
                                   match x with
-                                  |0 | 1 ->1
-                                  |x -> x + fac(x-1)
+                                  |0 ->1
+                                  |x -> x * fac(x-1)
                                fun x -> fac x)
 
 
