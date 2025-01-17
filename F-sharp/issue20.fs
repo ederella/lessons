@@ -1,5 +1,5 @@
 // 49.5.1
-let even_seq = Seq.initInfinite(fun x -> 2 * x)
+let even_seq = Seq.initInfinite(fun x -> 2 * x + 2)
 
 // 49.5.2
 let fac_seq = Seq.initInfinite(let rec fac x = 
