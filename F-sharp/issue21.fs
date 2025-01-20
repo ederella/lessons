@@ -5,8 +5,8 @@ let fac_seq = seq {
           yield! fac (i + 1) (i * a)}
      yield! seq (fac 1 1)} 
  
- // 50.2.2
- let seq_seq = seq{
+// 50.2.2
+let seq_seq = seq{
      let rec gen_seq i = seq {
           yield![- i;i]
           yield! gen_seq(i + 1)}
