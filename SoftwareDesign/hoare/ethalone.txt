@@ -1,0 +1,69 @@
+Реализация функции quickSort() -- сделаем её позапутаннее:)
+
+
+    public static void quickSort(int[] arr) {
+        quickSort(arr, 0, arr.length - 1);
+    }
+
+    private static void quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int pivotIndex = partition(arr, low, high);
+            quickSort(arr, low, pivotIndex - 1);
+            quickSort(arr, pivotIndex + 1, high);
+        }
+    }
+
+    private static int partition(int[] arr, int low, int high) {
+        int pivot = arr[high];
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (arr[j] < pivot) {
+                i++;
+                swap(arr, i, j);
+            }
+        }
+        swap(arr, i + 1, high);
+        return i + 1;
+    }
+
+    private static void swap(int[] arr, int i, int j) {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+Тройка Хоара для функции quickSort(arr, low, high):
+
+{P(low, high)} quickSort(arr, low, high) {Q(low, high)}
+Предусловие P(low, high): массив arr имеет длину не менее high - low + 1, и 0 <= low <= high < arr.length.
+Постусловие Q(low, high): подмассив arr[low..high] отсортирован по возрастанию.
+
+Доказательство для функции partition(arr, low, high)
+
+Предусловие P_partition: подмассив arr[low..high] существует и 0 <= low < high < arr.length.
+Постусловие Q_partition: возвращается индекс такой, что
+arr[low..pivotIndex-1] содержит элементы, меньшие или равные arr[pivotIndex],
+arr[pivotIndex+1..high] содержит элементы, большие arr[pivotIndex].
+
+Инвариант цикла для partition:
+
+- Все элементы arr[low..i] меньше, чем pivot.
+- Все элементы arr[i+1..j-1] больше или равны pivot.
+
+Доказательство для рекурсивного алгоритма quickSort
+
+База
+Когда low >= high, подмассив arr[low..high] состоит из одного элемента или пуст, это тривиально отсортированная последовательность.
+
+Индуктивный шаг
+Если low < high, partition(arr, low, high) возвращает индекс pivotIndex такой, что элементы в arr[low..pivotIndex-1] <= arr[pivotIndex], а элементы в arr[pivotIndex+1..high] >= arr[pivotIndex].
+
+Предусловие рекурсивных вызовов
+Для левой части: подмассив arr[low..pivotIndex-1].
+Для правой части: подмассив arr[pivotIndex+1..high].
+
+Постусловие: обе части будут отсортированы рекурсивными вызовами.
+
+Корректность функции swap() из-за простоты не приводится.
+
+Комбинируя эти результаты, доказываем, что каждое рекурсивное разбиение приводит к отсортированному объединению подмассивов, что, в конечном счете, означает, что весь массив arr будет отсортирован.
+
