@@ -1,0 +1,27 @@
+1) Класс Main не скомпилируется, так как метод makeSound() после изменений отсутствует в классе Animal. 
+Все 3 класса связаны и изменения в одном могут повлечь изменения в другом классе.
+
+2) Класс Cat не скомпилируется, потому что makeSound(int) отмечен аннотацией @Override, однако в родительском классе метод с таким именем и сигнатурой отсутвуют. 
+Класс Main не скомпилируется, так как в классе Animal отсутствует метод makeSound(int). Все 3 класса связаны и изменения в одном могут повлечь изменения в другом классе.
+
+3) Во-первых, код не скомпилируется, так как result определен в блоке try, который не виден из второго try.
+Во-вторых, в зависимостях не хватает библиотек jackson-annotations и jackson-core, зато добавлены 2 версии библиотеки jackson-databind.
+
+Следует использовать все 3 библиотеки вместе, так как между ними есть зависимости.
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-annotations</artifactId>
+    <version>2.18.2</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-core</artifactId>
+    <version>2.18.2</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.core</groupId>
+    <artifactId>jackson-databind</artifactId>
+    <version>2.18.2</version>
+</dependency>
