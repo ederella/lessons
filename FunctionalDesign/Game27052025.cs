@@ -2,13 +2,13 @@
 public static BoardState ProcessCascade(BoardState currentState)
 {
     BoardState finalState = currentState
-      .Pipe(FindAndRefoveMatches)
+      .Pipe(FindAndRemoveMatches)
       .Pipe(FillEmptySpaces);   
   
     return finalState == currentState ? finalState : finalState.Pipe(ProcessCascade);
 }
 
-public static BoardState FindAndRefoveMatches(BoardState currentState){
+public static BoardState FindAndRemoveMatches(BoardState currentState){
     var matches = FindMatches(currentState.Board);
     return RemoveMatches(currentState, matches);
 }
