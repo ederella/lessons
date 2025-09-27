@@ -1,3 +1,4 @@
+
 public static BoardState ProcessCascade(BoardState currentState)
         {
             return FindMatches(currentState.Board).Count == 0
@@ -8,5 +9,6 @@ public static BoardState ProcessCascade(BoardState currentState)
                         return RemoveMatches(bs, FindMatches(bs.Board));
                     })
                     .Pipe(FillEmptySpaces)
+                    .Pipe(HandleBonuses) // Новый шаг для обработки бонусов
                     .Pipe(ProcessCascade);
         }
