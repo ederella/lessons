@@ -1,0 +1,12 @@
+public static BoardState ProcessCascade(BoardState currentState)
+        {
+            return FindMatches(currentState.Board).Count == 0
+                ? currentState
+                : currentState
+                    .Pipe(bs =>
+                    {
+                        return RemoveMatches(bs, FindMatches(bs.Board));
+                    })
+                    .Pipe(FillEmptySpaces)
+                    .Pipe(ProcessCascade);
+        }
