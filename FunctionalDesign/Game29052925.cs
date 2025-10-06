@@ -7,16 +7,15 @@ public static Func<BoardState, BoardState> BuildGamePipeline(bool debugMode)
                     .Pipe(ProcessCascade);
         }
 
-        public static BoardState ProcessCascade(BoardState currentState)
-        {
-            bool debugMode = true /* Получаем из конфига или аргументов */;
-            Func<BoardState, BoardState> pipeline = BuildGamePipeline(debugMode);
-            return FindMatches(currentState.Board).Count == 0
+public static BoardState ProcessCascade(BoardState currentState)
+{
+    return currentState
+            .Pipe(state => FindMatches(state, GenerateLevelMatches()))
+            .Pipe(matches => matches.Count == 0
                 ? currentState
                 : currentState
-                    .Pipe(bs =>
-                    {
-                        return RemoveMatches(bs, FindMatches(bs.Board));
-                    })
-                   .Pipe(pipeline);
-        }
+                    .Pipe(s => RemoveMatches(s, matches))
+                    .Pipe(ApplyGravity)
+                    .Pipe(FillEmptySpaces)
+                    .Pipe(ProcessCascade));
+}
