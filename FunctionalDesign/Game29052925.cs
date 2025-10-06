@@ -10,7 +10,7 @@ public static Func<BoardState, BoardState> BuildGamePipeline(bool debugMode)
 public static BoardState ProcessCascade(BoardState currentState)
 {
     return currentState
-            .Pipe(state => FindMatches(state, GenerateLevelMatches()))
+            .Pipe(state => FindMatches(currentState))
             .Pipe(matches => matches.Count == 0
                 ? currentState
                 : currentState
