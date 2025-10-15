@@ -1,0 +1,52 @@
+1.2. Сделайте три простых класса из любой (одной) компьютерной темы, которая вам интересна, и которые логически связаны друг с другом. В каждом классе должно быть не менее трёх (лучше 5-7) полей.
+Создайте несколько объектов этих классов, поприсваивайте значения их полям, выведите их на экран.
+
+Классы к игре Цивилизация:
+class Country:
+    name = ''
+    leader_name = ''
+    points = 0
+    gold = 0
+    resources = []
+    cities = []   
+    military_units = []
+    relations = []
+    
+class City:
+    name = ''
+    location = ''
+    country = ''
+    population = 1
+    buildings = []
+    gold_per_step = 0
+    
+class Military_unit:
+    speed = 0
+    strength = 0
+    health = 100
+    is_activated = True
+    bonuses = []
+    
+
+
+russia = Country()
+russia.name='Russia'
+russia.leader_name='Ivan IV'
+
+moscow = City()
+moscow.name = 'Moscow'
+moscow.location = (10,110)
+russia.cities.append(moscow)
+
+archer = Military_unit()
+archer.speed = 10
+archer.strength = 20
+russia.military_units.append(archer)
+
+print(russia.name + ', leader ' + russia.leader_name + ', capital ' + russia.cities[0].name + ', has ' + str(len(russia.military_units)) + ' military unit(s)')
+
+
+
+
+
+
