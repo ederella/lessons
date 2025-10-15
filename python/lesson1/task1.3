@@ -1,0 +1,53 @@
+1.3. Напишите наглядный пример на основе задания 2, который демонстрирует побочный эффект от передачи объектов по ссылке.
+
+class Country:
+    name = ''
+    leader_name = ''
+    points = 0
+    gold = 0
+    resources = []
+    cities = []   
+    military_units = []
+    relations = []
+    
+class City:
+    name = ''
+    location = ''
+    country = ''
+    population = 1
+    buildings = []
+    gold_per_step = 0
+    
+class Military_unit:
+    speed = 0
+    strength = 0
+    health = 100
+    is_activated = True
+    bonuses = []
+    
+
+
+russia = Country()
+russia.name='Russia'
+russia.leader_name='Ivan IV'
+
+moscow = City()
+moscow.name = 'Moscow'
+moscow.location = (10,110)
+russia.cities.append(moscow)
+
+archer = Military_unit()
+archer.speed = 10
+archer.strength = 20
+russia.military_units.append(archer)
+
+#добавляем по ссылке еще стрельцов
+russia.military_units.append(archer)
+russia.military_units.append(archer)
+
+#последний стрелец пал смертью храбрых
+russia.military_units[2].health = 0
+
+#остальные стрельцы тоже скончались, так как были ссылками на один и тот же объект
+for unit in russia.military_units:
+    print(unit.health)
