@@ -1,0 +1,109 @@
+from random import randint
+
+class Country:
+    def __init__(self, name: str, leader_name: str):
+        self.name = name
+        self.leader_name = leader_name
+        self.points = 0
+        self.gold = 0
+        self.resources = []
+        self.cities = []   
+        self.military_units = []
+        self.relations = []
+        
+    def Build_new_city(self, name: str, location):
+        city = City(name, location, self)
+        self.cities.append(city)
+        
+    def Obtain_gold(self, gold: int):
+        self.gold += gold
+        print(self.name + ' now has ' +  str(self.gold) + ' gold')
+        
+    def Discover_resource(self, resource: str):
+        self.resources.append(resource)
+        
+    def Sell_resource(self, resource: str, price: int, buyer):
+        if buyer.Buy_resource(resource, price):
+            print(self.name + ' sold ' + resource)
+            self.resources.remove(resource)
+            self.Obtain_gold(price)
+        else:
+            print('The deal is cancelled')
+        
+    def Buy_resource(self, resource: str, price: int):
+        if self.gold >= price:
+            print(self.name + ' bought ' + resource)
+            self.resources.append(resource)
+            self.Obtain_gold(-price)
+            return True
+        return False
+
+    def Hire_military_units(self, speed, strength, city, count):
+        for i in range(0, count):
+            unit = Military_unit(speed, strength, city.location)
+            self.military_units.append(unit)
+            
+        
+    
+class City:
+    def __init__(self, name, location, country):
+        self.name = name
+        self.location = location
+        self.country = country
+        self.population = 1
+        self.buildings = []
+        self.gold_per_step = 0
+        print('city ' + self.name + ' was founded in ' + country.name)
+
+
+    
+class Military_unit:
+    def __init__(self, speed, strength, location):
+        self.speed = speed
+        self.strength = strength
+        self.health = 100
+        self.is_activated = True
+        self.location = location
+        self.bonuses = 0
+
+    
+    def fight(self, enemy):
+        if enemy.health < self.strength:
+            enemy.health = 0
+        else:
+            enemy.health -= self.strength
+        if enemy.health == 0:
+            self.bonuses +=1
+        
+    def move(self, location):
+        self.location = location
+        print('unit moved to ' + str(location))
+        
+    def heal(self, health_points):
+        self.health += health_points
+        print('unit healed to ' + str(self.health) + '%')
+
+
+russia = Country('Russia', 'Ivan IV')
+turkey = Country('Ottoman Empire', 'Suleyman I')
+
+russia.Build_new_city('Moscow', (10, 100))
+turkey.Build_new_city('Istanbul', (100, 100))
+
+russia.Obtain_gold(randint(1, 100))
+turkey.Obtain_gold(randint(1, 100))
+
+russia.Discover_resource('timber')
+russia.Discover_resource('timber')
+
+turkey.Discover_resource('horses')
+
+russia.Sell_resource('timber', 10, turkey)
+
+russia.Hire_military_units(10, 20, russia.cities[0], 3)
+turkey.Hire_military_units(10, 15, turkey.cities[0], 5)
+
+russia.military_units[0].move([100,100])
+
+russia.military_units[0].fight(turkey.military_units[0])
+turkey.military_units[0].heal(10)
