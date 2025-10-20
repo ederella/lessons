@@ -1,3 +1,10 @@
+4.1. Реализуйте композицию для двух иерархий классов из предыдущего занятия. Напишите код для работы с объектами соответствующих классов, из которого наглядно понятна идея композиции.
+
+
+В классе Country присутствуют поля __military_units и __production_units. 
+__military_units содержит наследников MilitaryUnit - Archer и Knight
+__production_units содержит наследников ProductionUnit - Workder и Merchant
+
 from random import randint
 
 
@@ -234,6 +241,7 @@ russia.hire_production_units('worker', location_of_Moscow, 2)
 russia.hire_production_units('merchant', location_of_Moscow, 1)
 russia.hire_military_units('archer', location_of_Moscow, 2)
 russia.hire_military_units('knight', location_of_Moscow, 3)
+
 russia.build_new_city('Vladimir', (20, 100))
 location_of_Vladimir = russia.get_cities()[1].get_location()
 russia.move_all_units(location_of_Vladimir)
