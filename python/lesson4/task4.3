@@ -1,0 +1,41 @@
+4.3. Напишите функцию, которая получает на вход список list[Animal] из этого примера, очищает его, и затем заполняет 500 объектами, где будут случайно перемешаны 500 объектов двух дочерних классов.
+Не забывайте, что объекты обычным присваиванием не копируются.
+Получите с её помощью результат, и в цикле, не зная где какой объект, вызывайте foo().
+
+Почему получился такой вывод?
+
+
+import random
+
+class Animal:
+    def foo(self):
+        pass
+
+class Cat(Animal):
+    def foo(self):
+        print("Кошка мурлычет")
+
+class Bird(Animal):
+    def foo(self):
+        print("Птица поет")
+
+def do_something_with_animal(animal: Animal):
+    animal.foo()
+
+def func_500(animals:list[Animal]):
+    animals.clear()
+    for k in range(0, 500):
+        animals.append(random.choice([Cat(), Bird()]))
+
+cat = Cat()
+bird = Bird()
+
+do_something_with_animal(cat)
+do_something_with_animal(bird)
+list_of_animals = [cat, bird]
+func_500(list_of_animals)
+for i in range(0, 500):
+    list_of_animals[i].foo()
+
+
+foo() вызвался в зависимости от типа добавленного в список объекта - для Cat - результат был "Кошка мурлычет", для Bird - "Птица поет"
