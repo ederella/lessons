@@ -1,1 +1,28 @@
 4.2. Расскажите своими словами, как вы поняли пример с двумя видами полиморфизма.
+----------------
+Пример:
+class Animal:
+    def foo(self):
+        pass
+
+class Cat(Animal):
+    def foo(self):
+        print("Кошка мурлычет")
+
+class Bird(Animal):
+    def foo(self):
+        print("Птица поет")
+
+def do_something_with_animal(animal: Animal):
+    animal.foo()
+
+cat = Cat()
+bird = Bird()
+
+do_something_with_animal(cat)
+do_something_with_animal(bird)
+---------------------------------
+
+В функцию do_something_with_animal передается Cat cat, он приводится к Animal (ad-hoc полиморфизм), в теле функции у animal вызывается метод foo, но поскольку он переопределен в дочернем классе - срабатывает параметрический полиморфизм и вызывается foo(Cat cat).
+Аналогично с вызовом do_something_with_animal для bird
+  
