@@ -31,3 +31,8 @@
   - Еще один вложенный
 * Звездочки
 + Плюсы
+
+
+[Это ссылка](https://www.ya.ru)
+
+![Это картинка](https://github.com/user-attachments/assets/66eea61b-b39b-4b76-aa5f-f85c78706410)
