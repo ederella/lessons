@@ -38,4 +38,16 @@
 
 
 `print('Hello!')`
-<pre> ```python def hello_world(): print("Hello, World!") ``` </pre>
+
+```python 
+def hello_world():
+print("Hello, World!")
+```
+
+```javascript 
+console.log("Hello, World!");
+```
+```java
+System.out.println("Hi!");
+System.out.println("Bye!");
+```
