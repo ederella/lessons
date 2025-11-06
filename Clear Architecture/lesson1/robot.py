@@ -8,8 +8,9 @@ class Robot:
         self.__is_working = False
 
     def move(self, path: int) :
-        x = path * math.sin(self.__angle)
-        y = path * math.cos(self.__angle)
+        angle_rads = angle * (math.pi/180.0)
+        x += path * math.sin(angle_rads)
+        y += path * math.cos(angle_rads)
         self.__pos = (x, y)
         print('POS ' + str(self.__pos))
 
