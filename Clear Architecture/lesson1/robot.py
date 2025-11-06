@@ -31,9 +31,18 @@ class Robot:
         print('STOP')
 
 robot = Robot()
-command = ('','')
-while command[0] != 'quit':
-    command = input('Введите команду: ').split(' ')
+
+code = (
+    'move 100',
+    'turn -90',
+    'set soap',
+    'start',
+    'move 50',
+    'stop'
+)
+
+for command in code:
+    command = command.split(' ')
     if command[0] == 'move':
         robot.move(int(command[1]))
     if command[0] == 'turn':
