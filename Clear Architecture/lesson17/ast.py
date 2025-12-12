@@ -1,141 +1,129 @@
-
-import pure_robot
-from pymonad.operators.maybe import Just, Maybe
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Protocol, Callable, TypeVar, Generic, Any
+from enum import Enum
+import math
+
+T = TypeVar('T')
+R = TypeVar('R')
 
 
 @dataclass
-class Response(ABC):
+class RobotState:
+    x: float
+    y: float
+    angle: float
+    state: int
+
+
+class CleaningMode(Enum):
+    WATER = 1
+    SOAP = 2
+    BRUSH = 3
+
+
+@dataclass
+class MoveResponse:
+    distance_moved: float
     success: bool
 
-@dataclass
-class MoveResponse (Response):
-    distance: int
 
 @dataclass
-class TurnResponse  (Response):
-    angle: int
+class TurnResponse:
+    angle_turned: float
+    success: bool
+
 
 @dataclass
-class StateResponse  (Response):
-    state: pure_robot.CleaningMode
+class StateResponse:
+    mode: CleaningMode
+    success: bool
 
 
-class RobotCommand(ABC):
-    @abstractmethod
-    def execute(self, state_ls: list) -> Maybe:
+class RobotProgram(Protocol):
+    def interpret(self, state: RobotState) -> tuple[Any, RobotState]:
         pass
 
-class MoveCommand(RobotCommand):
-    def __init__(self, distance, next_command):
-        self.distance = distance
 
-    def execute(self, state_ls: list) -> MoveResponse:
-        res = pure_robot.move(log, self.distance, state_ls[-1])
-        state_ls.append(res)
-        return MoveResponse(self.distance, True)
-
-    def next(next_command):
-        
-
-class TurnCommand(RobotCommand):
-    def __init__(self, angle, next):
-        self.angle = angle
-
-    def execute(self, state_ls: list) -> Maybe:
-        res = pure_robot.turn(log, self.angle, state_ls[-1])
-        state_ls.append(res)
-        return Just(state_ls)
+class Stop:
+    def interpret(self, state: RobotState) -> tuple[None, RobotState]:
+        return None, state
 
 
-class SetStateCommand(RobotCommand):
-    def __init__(self, new_state, next):
-        self.new_state = new_state
+@dataclass
+class Move(Generic[T]):
+    distance: float
+    next: Callable[[MoveResponse], T]
 
-    def execute(self, state_ls: list) -> Maybe:
-        res = pure_robot.set_state(log, self.new_state, state_ls[-1])
-        state_ls.append(res)
-        return Just(state_ls)
-
-
-class StartCommand(RobotCommand):
-    def __init__(self, next):
-        self.new_state = new_state
-
-    def execute(self, state_ls: list) -> Maybe:
-        res = pure_robot.start(log, state_ls[-1])
-        state_ls.append(res)
-        return Just(state_ls)
+    def interpret(self, state: RobotState) -> tuple[T, RobotState]:
+        angle_rads = state.angle * (math.pi / 180.0)
+        new_state = RobotState(
+            x=state.x + self.distance * math.cos(angle_rads),
+            y=state.y + self.distance * math.sin(angle_rads),
+            angle=state.angle,
+            state=state.state
+        )
+        response = MoveResponse(self.distance, True)
+        next_program = self.next(response)
+        return next_program, new_state
 
 
-class StopCommand(RobotCommand):
-    def execute(self, state_ls: list) -> Maybe:
-        res = pure_robot.stop(log, state_ls[-1])
-        state_ls.append(res)
-        return Just(state_ls)
+@dataclass
+class Turn(Generic[T]):
+    angle: float
+    next: Callable[[TurnResponse], T]
+
+    def interpret(self, state: RobotState) -> tuple[T, RobotState]:
+        new_state = RobotState(
+            x=state.x,
+            y=state.y,
+            angle=state.angle + self.angle,
+            state=state.state
+        )
+        response = TurnResponse(self.angle, True)
+        return self.next(response), new_state
 
 
-class RobotController:
-    def __init__(self, initial_state):
-        self.state_ls = [initial_state]
-        self.commands = []
-        self.history = []  # для возможной реализации undo
+@dataclass
+class SetState(Generic[T]):
+    new_state: CleaningMode
+    next: Callable[[StateResponse], T]
 
-    def add_command(self, command: RobotCommand):
-        self.commands.append(command)
-        return self  # для fluent interface
-
-    def execute_all(self):
-        result = Just(self.state_ls)
-        for command in self.commands:
-            result = result >> command.execute
-        return result
-
-    def execute_single(self, command: RobotCommand):
-        self.commands.append(command)
-        return command.execute(self.state_ls)
-
-    def clear_commands(self):
-        self.commands.clear()
-        return self
+    def interpret(self, state: RobotState) -> tuple[T, RobotState]:
+        new_state = RobotState(
+            x=state.x,
+            y=state.y,
+            angle=state.angle,
+            state=self.new_state.value
+        )
+        response = StateResponse(self.new_state, True)
+        return self.next(response), new_state
 
 
-class CommandFactory:
-    @staticmethod
-    def move(distance):
-        return MoveCommand(distance)
+class Interpreter:
+    def run(self, program: RobotProgram, initial_state: RobotState) -> RobotState:
+        current_program = program
+        current_state = initial_state
+        while current_program is not None and not isinstance(current_program, Stop):
+            next_program, current_state = current_program.interpret(current_state)
+            current_program = next_program
+        return current_state
 
-    @staticmethod
-    def turn(angle):
-        return TurnCommand(angle)
 
-    @staticmethod
-    def set_state(new_state):
-        return SetStateCommand(new_state)
+# Узлы AST:
+class Stop:  # Терминальный узел
+    def interpret(self, state: RobotState) -> tuple[None, RobotState]:
+        return None, state
 
-    @staticmethod
-    def start():
-        return StartCommand()
+@dataclass
+class Move(Generic[T]):  # Нетерминальный узел
+    distance: float      # Параметр узла
+    next: Callable[[MoveResponse], T]  # Ссылка на следующий узел
 
-    @staticmethod
-    def stop():
-        return StopCommand()
+if __name__ == '__main__':
+    program = Move(100.0, lambda r:
+        Turn(-90.0, lambda r:
+        SetState(CleaningMode.SOAP, lambda r:
+        Move(50.0, lambda r:
+        Stop()))))
 
-def log(msg):
-    print(msg)
 
-if __name__ == "__main__":
-    robot_state = pure_robot.RobotState(0.0, 0.0, 0, pure_robot.CleaningMode.WATER)
-    print("Initial state:", robot_state)
-
-    controller = RobotController(robot_state)
-
-    state_list = [robot_state]
-    result = Just(state_list) >> CommandFactory.move(100).execute \
-              >> CommandFactory.turn(-90).execute \
-              >> CommandFactory.set_state('SOAP').execute \
-              >> CommandFactory.start().execute \
-              >> CommandFactory.move(50).execute \
-              >> CommandFactory.stop().execute
-    print("Result:", result)
