@@ -1,115 +1,88 @@
-import unittest
+class Node:
 
-from task_1_linked_list.decision import Node, LinkedList
+    def __init__(self, v):
+        self.value = v
+        self.next = None
 
+class LinkedList:
 
-class MyTestCase(unittest.TestCase):
-    def test_delete(self):
-        s_list = LinkedList()
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(2))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(4))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(3))
+    def __init__(self):
+        self.head = None
+        self.tail = None
 
-        s_list.delete(3)
-        self.assertEqual(to_list(s_list), [2, 3, 4, 3, 3])
+    def add_in_tail(self, item):
+        if self.head is None:
+            self.head = item
+        else:
+            self.tail.next = item
+        self.tail = item
 
-        s_list.delete(33)
-        self.assertEqual(to_list(s_list), [2, 3, 4, 3, 3])
+    def print_all_nodes(self):
+        node = self.head
+        while node is not None:
+            print(node.value)
+            node = node.next
 
-        s_list.delete(3,True)
-        self.assertEqual(to_list(s_list), [2, 4])
+    def find(self, val):
+        node = self.head
+        while node is not None:
+            if node.value == val:
+                return node
+            node = node.next
+        return None
 
-        s_list.delete(33)
-        self.assertEqual(to_list(s_list), [2, 4])
+    def find_all(self, val):
+        result = []
+        node = self.head
+        while node is not None:
+            if node.value == val:
+                result.append(node)
+            node = node.next
+        return result
 
-        s_list_empty = LinkedList()
-        s_list_empty.delete(3)
-        self.assertEqual(to_list(s_list_empty), [])
-        s_list_empty.delete(3, True)
-        self.assertEqual(to_list(s_list_empty), [])
+    def delete(self, val, all=False):
+        node = self.head
+        prev_node = None
+        while node is not None:
+            if node.value == val:
+                if prev_node is None:
+                    self.head = node.next
+                else:
+                    prev_node.next = node.next
+                if self.tail == node:
+                    self.tail = prev_node
+                if not all:
+                    return None
+            else:
+                prev_node = node
+            node = node.next
+        return None
 
-        s_list_1 = LinkedList()
-        s_list_1.add_in_tail(Node(3))
-        s_list_1.delete(3)
-        self.assertEqual(to_list(s_list_1), [])
+    def clean(self):
+        self.head = None
+        self.tail = None
 
-        s_list_1.add_in_tail(Node(3))
-        s_list_1.delete(3,True)
-        self.assertEqual(to_list(s_list_1), [])
+    def len(self):
+        node = self.head
+        size = 0
+        while node is not None:
+            node = node.next
+            size+=1
+        return size
 
-    def test_len(self):
-        s_list = LinkedList()
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(2))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(4))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(3))
-
-        self.assertEqual(s_list.len(), 6)
-
-        s_list_empty = LinkedList()
-        self.assertEqual(s_list_empty.len(), 0)
-
-    def test_clean(self):
-        s_list = LinkedList()
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(2))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(4))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(3))
-
-        s_list.clean()
-
-        self.assertEqual(to_list(s_list), [])
-
-
-    def test_find_all(self):
-        s_list = LinkedList()
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(2))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(4))
-        s_list.add_in_tail(Node(3))
-        s_list.add_in_tail(Node(3))
-
-        res = s_list.find_all(3)
-
-        self.assertEqual(len(res), 4)
-
-        for el in res:
-            self.assertEqual(el.value, 3)
-
-    def test_insert(self):
-        s_list = LinkedList()
-        node1 = Node(1)
-        node2 = Node(2)
-        node3 = Node(3)
-        s_list.add_in_tail(node1)
-        s_list.add_in_tail(node2)
-        s_list.add_in_tail(node3)
-
-        s_list.insert(node1, Node(11))
-        self.assertEqual(to_list(s_list), [1,11,2,3])
-
-        node111 = Node(111)
-        s_list.insert(node3, node111)
-        self.assertEqual(to_list(s_list), [1, 11, 2, 3, 111])
-        s_list.insert(node111, Node(222))
-        self.assertEqual(to_list(s_list), [1, 11, 2, 3, 111, 222])
-
-def to_list(s_list: LinkedList):
-    node = s_list.head
-    ls = []
-    while node is not None:
-        ls.append(node.value)
-        node = node.next
-    return ls
+    def insert(self, afterNode:Node, newNode:Node):
+        if self.head is None:
+            self.head = newNode
+            self.tail = newNode
+            return None
+        if afterNode is None or newNode is None:
+            return None
+        after_node_next = afterNode.next
+        afterNode.next = newNode
+        newNode.next = after_node_next
+        if self.tail == afterNode:
+            self.tail = newNode
+        return None
 
 
-if __name__ == '__main__':
-    unittest.main()
+
