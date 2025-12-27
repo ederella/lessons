@@ -106,6 +106,9 @@ class MyTestCase(unittest.TestCase):
         s_list_empty.insert(None, Node(1))
         self.assertEqual(to_list(s_list_empty), [1])
 
+        s_list_empty.insert(None, Node(2))
+        self.assertEqual(to_list(s_list_empty), [2, 1])
+
 def to_list(s_list: LinkedList):
     node = s_list.head
     ls = []
