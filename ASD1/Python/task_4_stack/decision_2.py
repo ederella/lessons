@@ -164,8 +164,6 @@ def postfix_calc(in_str: str) -> int:
             stack2.push(value)
     return stack2.pop()
 
-print(postfix_calc('8 2 + 5 * 9 + ='))
-
 """Рефлексия по решению задач задания 2.
 
 9. Метод, который "переворачивает" связный список.
